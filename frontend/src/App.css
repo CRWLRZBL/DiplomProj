@@ -97,7 +97,7 @@ html, body {
 .car-image-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 
@@ -708,6 +708,58 @@ html, body {
   background-color: #212529 !important;
   color: #fff !important;
   font-weight: 600;
+}
+
+/* Каталог: фото целиком внутри блока */
+.catalog-listing-image-wrap {
+  height: 220px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.catalog-listing-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.catalog-detail-main-image {
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  max-height: 480px;
+  overflow: hidden;
+}
+
+.catalog-detail-main-image img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.catalog-thumb {
+  width: 88px;
+  height: 66px;
+  overflow: hidden;
+  background: #f8f9fa;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.catalog-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 /* Статусы автомобилей */

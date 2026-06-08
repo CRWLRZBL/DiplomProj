@@ -48,6 +48,33 @@ const CarFilters: React.FC<CarFiltersProps> = ({
     loadFilterData();
   }, []);
 
+  useEffect(() => {
+    if (catalogCars.length === 0) return;
+
+    const catalogBrandNames = [
+      ...new Set(catalogCars.map((c) => c.brandName).filter(Boolean)),
+    ].sort((a, b) => a.localeCompare(b, 'ru'));
+
+    setBrands((prev) => {
+      const merged = new Map<string, Brand>();
+      prev.forEach((b) => merged.set(b.brandName.toLowerCase(), b));
+      catalogBrandNames.forEach((name, i) => {
+        const key = name.toLowerCase();
+        if (!merged.has(key)) {
+          merged.set(key, { brandId: 10_000 + i, brandName: name });
+        }
+      });
+      return [...merged.values()].sort((a, b) =>
+        a.brandName.localeCompare(b.brandName, 'ru')
+      );
+    });
+
+    const catalogBodyTypes = [
+      ...new Set(catalogCars.map((c) => c.bodyType).filter(Boolean)),
+    ];
+    setBodyTypes((prev) => [...new Set([...prev, ...catalogBodyTypes])].sort());
+  }, [catalogCars]);
+
   const loadFilterData = async () => {
     try {
       setIsLoading(true);

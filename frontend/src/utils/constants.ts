@@ -116,6 +116,22 @@ export const FUEL_TYPE_LABELS: Record<string, string> = {
   [FUEL_TYPES.HYBRID]: 'Гибрид',
 } as const;
 
+const lookupLabel = (map: Record<string, string>, value: string): string => {
+  if (map[value]) return map[value];
+  const key = Object.keys(map).find((k) => k.toLowerCase() === value.toLowerCase());
+  return key ? map[key] : value;
+};
+
+export const getBodyTypeLabel = (value?: string | null): string => {
+  if (!value) return '—';
+  return lookupLabel(BODY_TYPE_LABELS, value);
+};
+
+export const getFuelTypeLabel = (value?: string | null): string => {
+  if (!value) return '—';
+  return lookupLabel(FUEL_TYPE_LABELS, value);
+};
+
 // Категории дополнительных опций
 export const OPTION_CATEGORIES = {
   COMFORT: 'Comfort',

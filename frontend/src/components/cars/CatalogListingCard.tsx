@@ -20,12 +20,10 @@ const CatalogListingCard: React.FC<Props> = ({ car }) => {
   return (
     <Card className="h-100 catalog-listing-card shadow-sm border-0">
       <Link to={`/catalog/${car.carId}`} className="text-decoration-none">
-        <div className="position-relative">
-          <Card.Img
-            variant="top"
+        <div className="catalog-listing-image-wrap position-relative">
+          <img
             src={image}
             alt={car.title || `${car.brandName} ${car.modelName}`}
-            style={{ height: 200, objectFit: 'cover' }}
             onError={handleCatalogImageError}
           />
           <Badge

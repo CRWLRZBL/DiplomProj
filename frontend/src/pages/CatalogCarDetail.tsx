@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Badge, Button, Card, ListGroup } from 'react-bootstrap';
 import { carService } from '../services/api/carService';
 import { Car } from '../services/models/car';
-import { utils } from '../utils/constants';
+import { utils, getBodyTypeLabel, getFuelTypeLabel } from '../utils/constants';
 import {
   resolveCatalogImageSrc,
   resolvePublicImageUrl,
@@ -69,11 +69,11 @@ const CatalogCarDetail: React.FC = () => {
     { label: 'Состояние', value: car.condition },
     { label: 'Модификация', value: car.trim },
     { label: 'Объём двигателя', value: car.engineCapacity ? `${car.engineCapacity} л` : null },
-    { label: 'Тип двигателя', value: car.fuelType },
+    { label: 'Тип двигателя', value: getFuelTypeLabel(car.fuelType) },
     { label: 'Коробка передач', value: car.transmission },
     { label: 'Привод', value: car.driveType },
     { label: 'Комплектация', value: car.trim },
-    { label: 'Тип кузова', value: car.bodyType },
+    { label: 'Тип кузова', value: getBodyTypeLabel(car.bodyType) },
     { label: 'Цвет', value: car.color },
     { label: 'Пробег', value: car.mileage && car.mileage > 0 ? `${car.mileage.toLocaleString('ru-RU')} км` : 'Новый' },
     ...(isGeneratedCatalogVin(car.vin)
@@ -89,13 +89,14 @@ const CatalogCarDetail: React.FC = () => {
 
       <Row className="mt-3 g-4">
         <Col lg={7}>
-          <Card className="border-0 shadow-sm mb-3">
-            <Card.Img
-              variant="top"
-              src={images[activeImage]}
-              style={{ maxHeight: 420, objectFit: 'cover' }}
-              onError={handleCatalogImageError}
-            />
+          <Card className="border-0 shadow-sm mb-3 overflow-hidden">
+            <div className="catalog-detail-main-image">
+              <img
+                src={images[activeImage]}
+                alt={car.title || `${car.brandName} ${car.modelName}`}
+                onError={handleCatalogImageError}
+              />
+            </div>
           </Card>
           {images.length > 1 && (
             <div className="d-flex flex-wrap gap-2">
@@ -109,9 +110,6 @@ const CatalogCarDetail: React.FC = () => {
                   <img
                     src={src}
                     alt=""
-                    width={88}
-                    height={66}
-                    style={{ objectFit: 'cover' }}
                     onError={handleCatalogImageError}
                   />
                 </button>

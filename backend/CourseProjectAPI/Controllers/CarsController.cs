@@ -187,8 +187,29 @@ namespace CourseProjectAPI.Controllers
         {
             try
             {
-                var brands = await _context.Brands.ToListAsync();
-                return Ok(brands);
+                var dbBrands = await _context.Brands.ToListAsync();
+                var catalogBrands = await _context.Cars
+                    .Where(c => c.IsPublished && c.CatalogBrand != null && c.CatalogBrand != "")
+                    .Select(c => c.CatalogBrand!)
+                    .Distinct()
+                    .ToListAsync();
+
+                var mergedNames = dbBrands
+                    .Select(b => b.BrandName)
+                    .Concat(catalogBrands)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(b => b)
+                    .ToList();
+
+                var result = mergedNames
+                    .Select((name, index) => new Brand
+                    {
+                        BrandId = index + 1,
+                        BrandName = name
+                    })
+                    .ToList();
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -201,10 +222,24 @@ namespace CourseProjectAPI.Controllers
         {
             try
             {
-                var bodyTypes = await _context.Models
+                var modelTypes = await _context.Models
                     .Select(m => m.BodyType)
+                    .Where(t => t != null && t != "")
                     .Distinct()
                     .ToListAsync();
+
+                var catalogTypes = await _context.Cars
+                    .Where(c => c.IsPublished && c.CatalogBodyType != null && c.CatalogBodyType != "")
+                    .Select(c => c.CatalogBodyType!)
+                    .Distinct()
+                    .ToListAsync();
+
+                var bodyTypes = modelTypes
+                    .Concat(catalogTypes)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(t => t)
+                    .ToList();
+
                 return Ok(bodyTypes);
             }
             catch (Exception ex)

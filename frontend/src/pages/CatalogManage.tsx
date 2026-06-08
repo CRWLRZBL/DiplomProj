@@ -596,7 +596,7 @@ const CatalogManage: React.FC = () => {
                             alt=""
                             width={120}
                             height={90}
-                            style={{ objectFit: 'cover', display: 'block' }}
+                            style={{ objectFit: 'contain', display: 'block', background: '#f8f9fa' }}
                             onError={handleCatalogImageError}
                           />
                           <div className="d-flex gap-1 p-1 bg-light">
