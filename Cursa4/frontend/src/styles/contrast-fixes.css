@@ -1,0 +1,86 @@
+/* Исправление контраста: активные вкладки, меню админки, характеристики каталога */
+
+.nav-pills .nav-link.active {
+  color: #fff !important;
+  background-color: #0d6efd !important;
+}
+
+.dp-auth-switcher .btn-dealership-dark,
+.dp-auth-switcher .btn-dealership-dark:hover,
+.dp-auth-switcher .btn-dealership-dark:focus {
+  color: #fff !important;
+}
+
+.admin-page .card-header.bg-primary,
+.admin-page .card-header.bg-primary h5,
+.admin-page .card-header.bg-primary .mb-0 {
+  color: #fff !important;
+}
+
+.admin-page .nav-pills.flex-column .nav-link {
+  color: #212529 !important;
+  border-radius: 0;
+}
+
+.admin-page .nav-pills.flex-column .nav-link:hover {
+  color: #212529 !important;
+  background-color: #f8f9fa !important;
+}
+
+.admin-page .nav-pills.flex-column .nav-link.active,
+.admin-page .nav-pills .nav-link.active,
+.admin-page a.nav-link.active {
+  color: #fff !important;
+  background-color: #0d6efd !important;
+  text-decoration: none !important;
+}
+
+.admin-page .nav-pills .nav-link.active i,
+.admin-page .nav-pills .nav-link.active:hover,
+.admin-page .nav-pills .nav-link.active:focus,
+.admin-page .admin-side-nav__link.active,
+.admin-page a.admin-side-nav__link.active {
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+.catalog-detail .catalog-spec-label {
+  color: #495057 !important;
+  font-weight: 600;
+}
+
+.catalog-detail .catalog-spec-value {
+  color: #212529 !important;
+}
+
+.home-page .hero-section .btn,
+.home-page .hero-section .btn:hover,
+.home-page .hero-section .btn:focus {
+  color: #fff !important;
+}
+
+/* Баннеры «Контакты», «О компании» */
+.static-hero,
+.static-hero h1,
+.static-hero .display-6,
+.static-hero p,
+.static-hero nav,
+.static-hero nav a,
+.static-hero nav span {
+  color: #fff !important;
+}
+
+.static-hero nav a:hover {
+  color: #fff !important;
+  opacity: 0.85;
+}
+
+/* Вход / Регистрация */
+.dealership-ui .dp-auth-switcher .btn-dealership-dark,
+.dealership-ui .dp-auth-switcher .btn-dealership-dark:hover,
+.dealership-ui .dp-auth-switcher .btn-dealership-dark:focus,
+.dealership-ui .dp-auth-switcher .btn-dealership-dark:active {
+  color: #fff !important;
+  background-color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+}

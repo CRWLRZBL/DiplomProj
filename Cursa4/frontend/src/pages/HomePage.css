@@ -1,0 +1,499 @@
+/* Главная в стиле современного дилерского лендинга (светлый фон, коралловый акцент). */
+.home-page--dealership {
+  background: #fff;
+  --hp-coral: #e96b5d;
+  --hp-coral-soft: #fde8e5;
+  --hp-peach: #fdf5f2;
+  --hp-text: #1a1a1a;
+  --hp-muted: #666;
+  --hp-radius-lg: 28px;
+  --hp-radius-md: 16px;
+  --hp-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.hp-heroFrame {
+  padding: 0 1rem 2rem;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+@media (min-width: 1400px) {
+  .hp-heroFrame {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+.hp-heroShell {
+  position: relative;
+  border-radius: var(--hp-radius-lg);
+  overflow: hidden;
+  min-height: min(78vh, 620px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #1a1a1a;
+  /* Сильнее затемняем фото, чтобы белый текст читался на любых участках кадра */
+  background-image: linear-gradient(115deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.62) 42%, rgba(0, 0, 0, 0.78) 100%),
+    var(--hp-hero-img, none);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+}
+
+.home-page--dealership .hp-heroShell h1.hp-heroTitle {
+  color: #fff !important;
+}
+
+.home-page--dealership .hp-heroShell .hp-heroLead {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.hp-heroBtnSecondary {
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 2px solid rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(6px);
+}
+
+.hp-heroBtnSecondary:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.hp-heroBtnGhost {
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: transparent !important;
+  border: 2px solid rgba(255, 255, 255, 0.55) !important;
+}
+
+.hp-heroBtnGhost:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.hp-heroTop {
+  position: relative;
+  z-index: 2;
+  padding: clamp(1.5rem, 4vw, 2.75rem) clamp(1.25rem, 3vw, 2.75rem) 1rem;
+}
+
+.hp-heroTitle {
+  font-weight: 800;
+  font-size: clamp(1.65rem, 4.2vw, 2.75rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+.hp-heroLead {
+  margin-top: 1rem;
+  max-width: 42ch;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.55;
+}
+
+.hp-heroActions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.hp-serviceRow {
+  position: relative;
+  z-index: 2;
+  padding: 0.75rem clamp(0.75rem, 2vw, 1rem) clamp(0.85rem, 2vw, 1.25rem);
+}
+
+.hp-serviceRow .row {
+  --bs-gutter-x: 0.75rem;
+  --bs-gutter-y: 0.75rem;
+}
+
+.hp-serviceCard {
+  height: 100%;
+  border: none;
+  border-radius: var(--hp-radius-md);
+  background: #fff !important;
+  color: var(--hp-text) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+a.hp-serviceCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.14);
+  color: var(--hp-text) !important;
+}
+
+.hp-serviceCard .card-body {
+  padding: 1rem 1rem 1.1rem;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.hp-serviceIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--hp-coral-soft);
+  color: var(--hp-text);
+}
+
+.hp-serviceTitle {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.hp-serviceText {
+  font-size: 0.8125rem;
+  color: var(--hp-muted);
+  line-height: 1.45;
+}
+
+.hp-section {
+  padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+}
+
+.hp-sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.hp-sectionTitle {
+  font-weight: 800;
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  color: var(--hp-text);
+  letter-spacing: -0.02em;
+}
+
+.hp-sectionSub {
+  color: var(--hp-muted);
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+
+.hp-linkAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--hp-text);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.hp-linkAll:hover {
+  color: var(--hp-coral);
+}
+
+.hp-stripWrap {
+  position: relative;
+}
+
+.hp-stripNav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.hp-stripBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  color: var(--hp-text);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.hp-stripBtn:hover:not(:disabled) {
+  border-color: var(--hp-coral);
+  color: var(--hp-coral);
+}
+
+.hp-stripBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.hp-carStrip {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 0.35rem;
+  margin: 0 -0.25rem;
+  scrollbar-width: thin;
+}
+
+.hp-carStrip::-webkit-scrollbar {
+  height: 6px;
+}
+
+.hp-carStrip::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 99px;
+}
+
+.hp-modelCard {
+  flex: 0 0 min(100%, 300px);
+  scroll-snap-align: start;
+  border: 1px solid #eee;
+  border-radius: var(--hp-radius-md);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--hp-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (min-width: 576px) {
+  .hp-modelCard {
+    flex: 0 0 280px;
+  }
+}
+
+.hp-modelCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+}
+
+.hp-modelCard__img {
+  height: 180px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.hp-modelCard__body {
+  padding: 1.1rem 1.15rem 1.15rem;
+}
+
+.hp-modelCard__title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--hp-text);
+  margin-bottom: 0.65rem;
+  line-height: 1.35;
+}
+
+.hp-modelSpecs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  font-size: 0.75rem;
+  color: var(--hp-muted);
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px solid #eee;
+}
+
+.hp-modelSpecs span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.hp-priceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.hp-priceMain {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--hp-text);
+}
+
+.hp-priceNote {
+  font-size: 0.8rem;
+  color: var(--hp-muted);
+}
+
+.hp-brands {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 2rem;
+}
+
+.hp-brands__logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.hp-brandBadge {
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: 0.12em;
+  color: var(--hp-text);
+}
+
+.hp-promoCard {
+  border: none;
+  border-radius: var(--hp-radius-md);
+  overflow: hidden;
+  box-shadow: var(--hp-shadow);
+  height: 100%;
+}
+
+.hp-promoCard .ratio img {
+  object-fit: cover;
+  opacity: 1;
+}
+
+.hp-promoCard .card-body {
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.hp-promoDate {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--hp-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+}
+
+.hp-about {
+  background: #fff;
+}
+
+.hp-about__text {
+  color: var(--hp-muted);
+  line-height: 1.65;
+  max-width: 52ch;
+}
+
+.hp-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  align-content: start;
+}
+
+@media (min-width: 992px) {
+  .hp-stats {
+    margin-top: 2rem;
+  }
+}
+
+.hp-stat {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: var(--hp-shadow);
+}
+
+.hp-stat--wide {
+  grid-column: 1 / -1;
+}
+
+.hp-stat__num {
+  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1;
+  color: var(--hp-text);
+  letter-spacing: -0.03em;
+}
+
+.hp-stat__label {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--hp-muted);
+  line-height: 1.4;
+}
+
+.hp-ctaBand {
+  background: var(--hp-peach);
+  padding: clamp(2rem, 4vw, 3rem) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hp-ctaInner {
+  position: relative;
+  z-index: 2;
+}
+
+.hp-ctaVisual {
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+@media (min-width: 992px) {
+  .hp-ctaVisual {
+    justify-content: flex-end;
+    margin-top: -3rem;
+  }
+}
+
+.hp-ctaBlob {
+  width: min(280px, 70vw);
+  height: min(280px, 70vw);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fff 0%, var(--hp-coral-soft) 100%);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 16px 48px rgba(233, 107, 93, 0.15);
+}
+
+.hp-ctaBlob .material-symbols-outlined {
+  font-size: 5rem;
+  color: var(--hp-coral);
+  opacity: 0.9;
+}
+
+.hp-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--hp-coral);
+  color: #fff;
+  border: none;
+  box-shadow: 0 14px 40px rgba(233, 107, 93, 0.45);
+  z-index: 1040;
+  display: grid;
+  place-items: center;
+}
+
+.hp-fab:hover {
+  background: #d85a4c;
+  color: #fff;
+}

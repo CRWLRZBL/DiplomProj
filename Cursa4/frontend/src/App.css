@@ -1,0 +1,1658 @@
+/* Базовые стили */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* Для правильного позиционирования */
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh; /* Изменено с height на min-height */
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff !important;
+  color: #212529 !important;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh; /* Изменено с height на min-height */
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  color: #212529 !important;
+}
+
+/* Bootstrap backdrop скрыт — используется .site-modal-overlay из useBodyScrollLock */
+.modal-backdrop {
+  display: none !important;
+}
+
+/* Убираем переопределения для стандартных контейнеров */
+
+/* Hero section - полная ширина */
+.home-page .hero-section {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Используем стандартные breakpoints Bootstrap */
+
+/* Страницы занимают всю доступную ширину без переполнения */
+.order-page,
+.catalog-page,
+.profile-page,
+.admin-page,
+.home-page {
+  width: 100%;
+  flex: 1 1 auto; /* Растягивается и занимает доступное пространство */
+  min-height: 0; /* Позволяет flex работать правильно */
+  overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+  position: relative; /* Для правильного позиционирования дочерних элементов */
+  display: flex;
+  flex-direction: column;
+  /* Оптимизация масштабирования */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+.main-content {
+  flex: 1 1 auto; /* Растягивается и занимает доступное пространство */
+  min-height: 0; /* Позволяет flex работать правильно */
+  padding-top: 0; /* Убираем лишний отступ сверху */
+  position: relative; /* Для правильного позиционирования дочерних элементов */
+  z-index: 1; /* Ниже header, но выше фона */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Карточки автомобилей */
+.car-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 1px solid #e9ecef;
+  position: relative; /* Для правильного позиционирования */
+  z-index: 1; /* Выше фона */
+}
+
+.car-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+  z-index: 2; /* При наведении выше других карточек */
+}
+
+.car-image-container {
+  position: relative;
+  overflow: hidden;
+  background: #f8f9fa;
+  height: 250px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.car-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.image-placeholder {
+  background: linear-gradient(45deg, #f8f9fa 25%, #e9ecef 25%, #e9ecef 50%, #f8f9fa 50%, #f8f9fa 75%, #e9ecef 75%);
+  background-size: 20px 20px;
+}
+
+/* Конфигуратор заказа */
+.order-wizard .form-check {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.order-wizard .form-check:has(input:checked) {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Навигация */
+.navbar {
+  position: relative; /* Убираем fixed, если он был */
+  z-index: 1030; /* Выше контента, но не перекрывает модальные окна */
+  flex-shrink: 0; /* Не сжимается */
+  width: 100%;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+/* Синий цвет для "Автосалон" в темном navbar */
+.navbar.bg-dark .navbar-brand-custom,
+.navbar-dark .navbar-brand-custom,
+.navbar[data-bs-theme="dark"] .navbar-brand-custom {
+  color: #0d6efd !important;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .car-card {
+    margin-bottom: 1rem;
+  }
+  
+  .main-content {
+    min-height: calc(100vh - 80px);
+  }
+  
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+  
+  /* Адаптивные таблицы */
+  .table-responsive table {
+    font-size: 0.875rem;
+  }
+  
+  .btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  .car-image-container {
+    height: 150px;
+  }
+  
+  .car-card .card-img-top {
+    height: 150px !important;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Статистические карточки */
+.stat-card {
+  transition: transform 0.2s ease-in-out;
+  position: relative; /* Для правильного позиционирования */
+  z-index: 1; /* Выше фона */
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  z-index: 2; /* При наведении выше других карточек */
+}
+
+/* Загрузка и состояния */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Улучшенные фильтры */
+.sticky-filters {
+  position: sticky;
+  top: 80px; /* Учитываем высоту navbar */
+  z-index: 10; /* Ниже navbar */
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+@media (max-width: 992px) {
+  .sticky-filters {
+    position: static;
+    max-height: none;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Кастомизация Bootstrap */
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.card {
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Material Icons */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Улучшение читаемости текста в карточках */
+.card-body {
+  color: #212529 !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+.card-title {
+  color: #212529 !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  font-size: 1.25rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.card-text {
+  color: #212529; /* Более темный цвет для лучшей читаемости */
+  line-height: 1.7; /* Увеличенный межстрочный интервал */
+  font-size: 1rem; /* Увеличен размер */
+  font-weight: 400;
+}
+
+.card-text strong {
+  color: #212529;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: #495057 !important; /* Улучшенный контраст вместо #6c757d */
+  font-size: 0.95rem; /* Увеличен размер */
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Улучшение контраста для важной информации */
+.car-card .h4,
+.car-card .h5 {
+  color: #212529;
+  font-weight: 600;
+}
+
+.car-card .text-primary {
+  color: #0d6efd !important;
+  font-weight: 700;
+}
+
+.form-control, .form-select {
+  border-radius: 0.5rem;
+}
+
+.alert {
+  border-radius: 0.75rem;
+  border: none;
+}
+
+.badge {
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Кастомные утилиты */
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shadow-hover {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.shadow-hover:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+/* Home Page Styles */
+.home-page .hero-section {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  position: relative;
+}
+
+/* Убеждаемся, что белый текст используется только на темном фоне */
+.home-page .hero-section.text-white {
+  color: #ffffff !important;
+}
+
+.home-page .hero-section.text-white h1,
+.home-page .hero-section.text-white h2,
+.home-page .hero-section.text-white h3,
+.home-page .hero-section.text-white h4,
+.home-page .hero-section.text-white h5,
+.home-page .hero-section.text-white h6,
+.home-page .hero-section.text-white p,
+.home-page .hero-section.text-white .lead {
+  color: #ffffff !important;
+}
+
+/* Запрещаем белый текст на светлом фоне */
+.bg-light.text-white,
+.bg-white.text-white,
+.text-white.bg-light,
+.text-white.bg-white {
+  color: #212529 !important;
+}
+
+.bg-light.text-white h1,
+.bg-light.text-white h2,
+.bg-light.text-white h3,
+.bg-light.text-white h4,
+.bg-light.text-white h5,
+.bg-light.text-white h6,
+.bg-light.text-white p,
+.bg-white.text-white h1,
+.bg-white.text-white h2,
+.bg-white.text-white h3,
+.bg-white.text-white h4,
+.bg-white.text-white h5,
+.bg-white.text-white h6,
+.bg-white.text-white p {
+  color: #212529 !important;
+}
+
+.home-page .min-vh-50 {
+  min-height: 50vh;
+}
+
+.home-page .hover-card {
+  transition: all 0.3s ease;
+}
+
+.home-page .hover-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+}
+
+.home-page .feature-icon {
+  opacity: 0.9;
+  transition: transform 0.3s ease;
+}
+
+.home-page .feature-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Footer Styles */
+.footer-link {
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #fff !important;
+}
+
+.footer-brand h4 {
+  font-weight: 700;
+}
+
+.contact-info a:hover {
+  color: #0d6efd !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .home-page .display-4 {
+    font-size: 2rem;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .home-page .lead {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 1.125rem !important;
+    line-height: 1.6 !important;
+    font-weight: 400 !important;
+  }
+  
+  .home-page .hero-section {
+    text-align: center;
+    padding: 3rem 0;
+  }
+  
+  .footer .row > div {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Social icons hover effect */
+.social-links a {
+  transition: transform 0.2s ease;
+}
+
+.social-links a:hover {
+  transform: scale(1.2);
+}
+
+/* Order Card Styles */
+.order-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  position: relative; /* Для правильного позиционирования */
+  z-index: 1; /* Выше фона */
+}
+
+.order-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: #0d6efd;
+  z-index: 2; /* При наведении выше других карточек */
+}
+
+.order-card .card-body {
+  padding: 1.5rem;
+}
+
+/* Car Details Styles */
+.car-details .thumbnail.active {
+  border-color: #0d6efd !important;
+}
+
+.car-details .thumbnail:hover {
+  border-color: #0d6efd;
+  opacity: 0.8;
+}
+
+.car-details .main-image img {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Admin Dashboard Styles */
+
+/* Form Styles */
+.form-control,
+.form-select {
+  color: #212529 !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  font-weight: 400 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  color: #212529 !important;
+}
+
+.form-label {
+  color: #212529 !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.form-text {
+  color: #495057 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+/* Badge Styles */
+.badge {
+  font-weight: 600 !important;
+  letter-spacing: 0.3px;
+  font-size: 0.875rem !important;
+  padding: 0.35em 0.65em !important;
+  line-height: 1.2 !important;
+}
+
+/* Table Styles */
+.table th {
+  border-top: none;
+  font-weight: 700 !important;
+  color: #212529 !important;
+  background-color: #f8f9fa;
+  font-size: 0.95rem !important;
+  padding: 0.75rem !important;
+}
+
+.table td {
+  color: #212529 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  padding: 0.75rem !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* Loading States */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+  .car-details .main-image img {
+    max-height: 300px !important;
+  }
+  
+  .order-card .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .order-card .btn-group .btn {
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
+  
+  .table-responsive table {
+    font-size: 0.875rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .navbar,
+  .footer,
+  .btn {
+    display: none !important;
+  }
+  
+  .card {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Focus Styles for Accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.border-hover {
+  transition: border-color 0.3s ease;
+}
+
+.border-hover:hover {
+  border-color: #0d6efd !important;
+}
+
+/* Status Badge Variants */
+.badge-status-pending {
+  background-color: #ffc107;
+  color: #000;
+  font-weight: 500;
+}
+
+.badge-status-confirmed {
+  background-color: #17a2b8;
+  color: #fff;
+  font-weight: 500;
+}
+
+.badge-status-inproduction {
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: 500;
+}
+
+.badge-status-completed {
+  background-color: #198754;
+  color: #fff;
+  font-weight: 500;
+}
+
+.badge-status-cancelled {
+  background-color: #dc3545;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Улучшенная читабельность для статусов с серым фоном */
+.badge.bg-secondary {
+  background-color: #495057 !important;
+  color: #fff !important;
+  font-weight: 500;
+  border: 1px solid #343a40;
+}
+
+.badge.bg-dark,
+.catalog-listing-type-badge.bg-dark {
+  background-color: #212529 !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+/* Статусы автомобилей */
+.badge.bg-success {
+  background-color: #28a745 !important;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+  font-weight: 500;
+}
+
+.badge.bg-danger {
+  background-color: #dc3545 !important;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+/* Car Configurator Styles */
+.car-configurator .color-option {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.car-configurator .color-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.car-configurator .color-option.border-primary {
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.car-configurator .color-preview {
+  transition: transform 0.3s ease;
+}
+
+.car-configurator .color-option:hover .color-preview {
+  transform: scale(1.1);
+}
+
+.car-configurator .engine-option,
+.car-configurator .transmission-option,
+.car-configurator .config-option {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.car-configurator .engine-option:hover,
+.car-configurator .transmission-option:hover,
+.car-configurator .config-option:hover {
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.car-configurator .engine-option.border-primary,
+.car-configurator .transmission-option.border-primary,
+.car-configurator .config-option.border-primary {
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.car-configurator .accordion-button {
+  font-weight: 600;
+}
+
+.car-configurator .accordion-button:not(.collapsed) {
+  background-color: #f8f9fa;
+  color: #0d6efd;
+}
+
+@media (max-width: 768px) {
+  .car-configurator .color-option {
+    margin-bottom: 1rem;
+  }
+  
+  .car-configurator .engine-option,
+  .car-configurator .transmission-option {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Order Page Styles */
+.order-page {
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  min-height: calc(100vh - 120px);
+  padding: 2rem 0;
+  color: #212529 !important;
+}
+
+/* Исправление белого текста на светлом фоне для страницы заказа */
+.order-page h1,
+.order-page .h1,
+.order-page h2,
+.order-page .h2,
+.order-page h3,
+.order-page .h3,
+.order-page h4,
+.order-page .h4,
+.order-page h5,
+.order-page .h5,
+.order-page h6,
+.order-page .h6 {
+  color: #212529 !important;
+  font-weight: 700 !important;
+}
+
+.order-page p,
+.order-page .lead {
+  color: #495057 !important;
+}
+
+.order-page .text-muted {
+  color: #495057 !important;
+}
+
+.sticky-sidebar {
+  position: sticky;
+  top: 80px; /* Учитываем высоту navbar */
+  z-index: 10; /* Ниже navbar */
+}
+
+.order-steps {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.order-steps::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e9ecef;
+}
+
+.order-step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.order-step .step-number {
+  position: absolute;
+  left: -2rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 2px solid #fff;
+  z-index: 1;
+}
+
+.order-step.completed .step-number {
+  background: #198754;
+  color: #fff;
+}
+
+.order-step.active .step-number {
+  background: #0d6efd;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.25);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(13, 110, 253, 0.1);
+  }
+}
+
+.order-step .step-content {
+  flex: 1;
+}
+
+.order-action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10; /* Ниже navbar и модальных окон */
+  margin-top: 2rem;
+  margin-bottom: 0;
+  padding-bottom: 1rem;
+  background: white; /* Фон для предотвращения просвечивания */
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1); /* Тень для визуального разделения */
+}
+
+.bg-gradient {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+}
+
+@media (max-width: 992px) {
+  .sticky-sidebar {
+    position: static;
+    margin-top: 2rem;
+  }
+  
+  .order-action-bar {
+    position: static;
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .order-page {
+    padding: 1rem 0;
+  }
+  
+  .order-steps {
+    padding-left: 1.5rem;
+  }
+  
+  .order-step .step-number {
+    left: -1.5rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Home Page Improvements */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  z-index: 1; /* Выше фона, но ниже navbar */
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0; /* Фон должен быть ниже контента */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2; /* Контент hero выше фона */
+}
+
+.hero-image-wrapper {
+  position: relative;
+  z-index: 1;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.car-card-image {
+  transition: transform 0.3s ease;
+}
+
+.car-card:hover .car-card-image {
+  transform: scale(1.05);
+}
+
+.car-image-overlay {
+  overflow: hidden;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.feature-card {
+  transition: all 0.3s ease;
+  background: white !important;
+  position: relative; /* Для правильного позиционирования */
+  z-index: 1; /* Выше фона */
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+  z-index: 2; /* При наведении выше других карточек */
+}
+
+.feature-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon-wrapper {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Catalog Page Styles */
+.catalog-page {
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  min-height: calc(100vh - 120px);
+  padding: 2rem 0;
+}
+
+.page-header {
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 2rem;
+}
+
+.catalog-header {
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.catalog-header h2,
+.catalog-header .h2,
+.catalog-header .h4 {
+  color: #212529 !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.catalog-header p,
+.catalog-header .text-muted {
+  color: #495057 !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+/* Profile Page Styles */
+.profile-page {
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  min-height: calc(100vh - 120px);
+  padding: 2rem 0;
+}
+
+.user-avatar {
+  display: flex;
+  justify-content: center;
+}
+
+.avatar-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.profile-info .info-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+  color: #212529 !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+.profile-info .info-item strong {
+  color: #212529 !important;
+  font-weight: 600 !important;
+}
+
+.profile-info .info-item:last-child {
+  border-bottom: none;
+}
+
+/* Admin Page Styles */
+.admin-page {
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  min-height: calc(100vh - 120px);
+  padding: 2rem 0;
+}
+
+.admin-page .nav-pills .nav-link {
+  border-radius: 0;
+  transition: all 0.3s ease;
+}
+
+.admin-page .nav-pills .nav-link:hover {
+  background-color: #f8f9fa;
+  transform: translateX(5px);
+}
+
+.admin-page .nav-pills .nav-link {
+  color: #212529;
+}
+
+.admin-page .nav-pills .nav-link.active {
+  background-color: #0d6efd;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.admin-page .card {
+  border-radius: 0.75rem;
+}
+
+.admin-page .table {
+  margin-bottom: 0;
+}
+
+.admin-page .table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive improvements */
+@media (max-width: 992px) {
+  .hero-section {
+    text-align: center;
+  }
+  
+  .hero-content {
+    margin-bottom: 2rem;
+  }
+  
+  .display-3 {
+    font-size: 2.5rem;
+  }
+  
+  .display-5 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalog-page,
+  .profile-page,
+  .admin-page {
+    padding: 1rem 0;
+  }
+  
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .avatar-circle {
+    width: 80px;
+    height: 80px;
+    font-size: 1.5rem;
+  }
+  
+  .hero-image-wrapper {
+    max-width: 100%;
+  }
+}
+
+/* Container-fluid с правильными отступами */
+.container-fluid.px-0 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    width: 100%;
+  }
+}
+
+/* Отступы между секциями на главной странице */
+.home-page > section {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0; /* Убираем лишние отступы */
+}
+
+.home-page > section + section {
+  margin-top: 0; /* Убираем лишние отступы между секциями */
+}
+
+.home-page .hero-section {
+  margin-bottom: 0; /* Убираем отступ снизу, так как следующий элемент сам добавит */
+}
+
+.home-page .bg-light {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Глобальное центрирование контента */
+body {
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+}
+
+/* Предотвращаем переполнение на всех уровнях */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Footer — светлая тема (см. Footer.css) */
+footer.site-footer {
+  background: #fff !important;
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+/* Оптимизация масштабирования для всех элементов */
+* {
+  /* Оптимизация рендеринга */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  /* Оптимизация производительности */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+/* Оптимизация масштабирования для изображений */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  /* Предотвращаем размытие при масштабировании */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: auto;
+}
+
+/* Оптимизация масштабирования для текста */
+@media (max-width: 576px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 769px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Оптимизация для высоких DPI экранов */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Оптимизация для touch устройств */
+@media (hover: none) and (pointer: coarse) {
+  .btn, .card, .car-card, .order-card, .feature-card {
+    /* Увеличиваем область нажатия */
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Убираем hover эффекты на touch устройствах */
+  .car-card:hover,
+  .order-card:hover,
+  .feature-card:hover,
+  .stat-card:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+   ГЛОБАЛЬНЫЕ УЛУЧШЕНИЯ ЧИТАЕМОСТИ ТЕКСТА
+   ============================================ */
+
+/* Улучшение читаемости для всех текстовых элементов */
+.list-group-item {
+  color: #212529 !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.list-group-item strong {
+  color: #212529 !important;
+  font-weight: 600 !important;
+}
+
+/* Улучшение читаемости для alert */
+.alert {
+  color: #212529 !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+.alert-heading {
+  color: #212529 !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Улучшение читаемости для кнопок */
+.btn {
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+/* Улучшение читаемости для small текста */
+.small, small {
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+  color: #495057 !important;
+}
+
+/* Улучшение читаемости для карточек заказов */
+.order-card,
+.order-wizard {
+  color: #212529 !important;
+}
+
+.order-card h5,
+.order-card h6,
+.order-wizard h5,
+.order-wizard h6 {
+  color: #212529 !important;
+  font-weight: 600 !important;
+}
+
+.order-card .text-muted,
+.order-wizard .text-muted {
+  color: #495057 !important;
+  font-size: 0.95rem !important;
+}
+
+/* Улучшение читаемости для шагов заказа */
+.order-steps .step-number {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+
+.order-steps .step-title {
+  color: #212529 !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+/* Улучшение читаемости для форм */
+.form-label {
+  color: #212529 !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.form-text {
+  color: #495057 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+/* Улучшение читаемости для всех span и div с текстом */
+span, div {
+  color: inherit;
+}
+
+/* Глобальное исправление для всех display классов - темный цвет по умолчанию */
+.display-1,
+.display-2,
+.display-3,
+.display-4,
+.display-5,
+.display-6 {
+  color: #212529 !important;
+  font-weight: 700 !important;
+}
+
+/* Дополнительная защита — не трогаем баннеры на тёмном фоне */
+*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-1,
+*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-2,
+*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-3,
+*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-4,
+*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-5,
+*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-6 {
+  color: #212529 !important;
+}
+
+/* Исключения для темных фонов */
+.static-hero .display-1,
+.static-hero .display-2,
+.static-hero .display-3,
+.static-hero .display-4,
+.static-hero .display-5,
+.static-hero .display-6,
+.static-hero h1,
+.static-hero h2,
+.static-hero p {
+  color: #ffffff !important;
+}
+
+.hero-section.text-white .display-1,
+.hero-section.text-white .display-2,
+.hero-section.text-white .display-3,
+.hero-section.text-white .display-4,
+.hero-section.text-white .display-5,
+.bg-primary.text-white .display-1,
+.bg-primary.text-white .display-2,
+.bg-primary.text-white .display-3,
+.bg-primary.text-white .display-4,
+.bg-primary.text-white .display-5,
+.bg-success.text-white .display-1,
+.bg-success.text-white .display-2,
+.bg-success.text-white .display-3,
+.bg-success.text-white .display-4,
+.bg-success.text-white .display-5,
+.bg-info.text-white .display-1,
+.bg-info.text-white .display-2,
+.bg-info.text-white .display-3,
+.bg-info.text-white .display-4,
+.bg-info.text-white .display-5,
+.bg-warning.text-white .display-1,
+.bg-warning.text-white .display-2,
+.bg-warning.text-white .display-3,
+.bg-warning.text-white .display-4,
+.bg-warning.text-white .display-5 {
+  color: #ffffff !important;
+}
+
+/* Улучшение контраста для важной информации */
+strong, b {
+  color: #212529 !important;
+  font-weight: 600 !important;
+}
+
+/* Улучшение читаемости для навигации */
+/* Базовые стили для nav-link - применяются только к светлым навбарам */
+.nav-link:not(.navbar.bg-dark .nav-link):not(.navbar-dark .nav-link) {
+  color: #212529 !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+}
+
+.nav-pills .nav-link.active {
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd !important;
+  font-weight: 600 !important;
+}
+
+/* Стили для темного навбара - переопределяем общий стиль .nav-link */
+.navbar.bg-dark .nav-link,
+.navbar-dark .nav-link,
+.navbar[data-bs-theme="dark"] .nav-link,
+.navbar.bg-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.navbar.bg-dark .nav-link:hover,
+.navbar-dark .nav-link:hover,
+.navbar[data-bs-theme="dark"] .nav-link:hover,
+.navbar.bg-dark .navbar-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+.navbar.bg-dark .nav-link.active,
+.navbar-dark .nav-link.active,
+.navbar[data-bs-theme="dark"] .nav-link.active,
+.navbar.bg-dark .navbar-nav .nav-link.active {
+  color: rgba(255, 255, 255, 1) !important;
+  font-weight: 600 !important;
+}
+
+/* Стили для NavDropdown в темном навбаре */
+.navbar.bg-dark .dropdown-toggle,
+.navbar-dark .dropdown-toggle,
+.navbar[data-bs-theme="dark"] .dropdown-toggle {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.navbar.bg-dark .dropdown-toggle:hover,
+.navbar-dark .dropdown-toggle:hover,
+.navbar[data-bs-theme="dark"] .dropdown-toggle:hover {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Dropdown меню должно быть светлым (белый фон, темный текст) */
+.navbar.bg-dark .dropdown-menu,
+.navbar-dark .dropdown-menu {
+  background-color: #fff !important;
+}
+
+.navbar.bg-dark .dropdown-menu .dropdown-item,
+.navbar-dark .dropdown-menu .dropdown-item {
+  color: #212529 !important;
+}
+
+.navbar.bg-dark .dropdown-menu .dropdown-item:hover,
+.navbar-dark .dropdown-menu .dropdown-item:hover {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+}
+
+/* Улучшение читаемости для модальных окон */
+.modal-title {
+  color: #212529 !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+}
+
+.modal-body {
+  color: #212529 !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+/* ============================================
+   ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ОТОБРАЖЕНИЯ
+   ============================================ */
+
+/* Принудительное исправление всех заголовков на светлом фоне */
+.page-header h1,
+.page-header .h1,
+.page-header .display-1,
+.page-header .display-2,
+.page-header .display-3,
+.page-header .display-4,
+.page-header .display-5,
+.page-header .display-6 {
+  color: #212529 !important;
+  font-weight: 700 !important;
+}
+
+/* Исправление для всех страниц */
+.catalog-page h1,
+.catalog-page h2,
+.catalog-page h3,
+.catalog-page h4,
+.catalog-page h5,
+.catalog-page h6,
+.profile-page h1,
+.profile-page h2,
+.profile-page h3,
+.profile-page h4,
+.profile-page h5,
+.profile-page h6,
+.order-page h1,
+.order-page h2,
+.order-page h3,
+.order-page h4,
+.order-page h5,
+.order-page h6,
+.admin-page h1,
+.admin-page h2,
+.admin-page h3,
+.admin-page h4,
+.admin-page h5,
+.admin-page h6 {
+  color: #212529 !important;
+}
+
+/* Улучшение контраста для всех текстовых элементов */
+.catalog-page,
+.profile-page,
+.order-page,
+.admin-page {
+  color: #212529 !important;
+}
+
+.catalog-page *,
+.profile-page *,
+.order-page *,
+.admin-page *:not(.nav-link):not(.nav-link *) {
+  color: inherit;
+}
+
+.admin-page .nav-pills .nav-link.active,
+.admin-page .nav-pills .nav-link.active * {
+  color: #fff !important;
+}
+
+/* Исключения для элементов, которые должны быть другого цвета */
+.catalog-page .text-primary,
+.profile-page .text-primary,
+.order-page .text-primary,
+.admin-page .text-primary {
+  color: #0d6efd !important;
+}
+
+.catalog-page .text-muted,
+.profile-page .text-muted,
+.order-page .text-muted,
+.admin-page .text-muted {
+  color: #495057 !important;
+}
+
+/* Улучшение для карточек */
+.card {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+}
+
+.card * {
+  color: inherit;
+}
+
+.card .text-primary {
+  color: #0d6efd !important;
+}
+
+.card .text-muted {
+  color: #495057 !important;
+}
+

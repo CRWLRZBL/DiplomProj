@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>БД: модуль сообщений на сайте</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #fff;
+      --border: #dee2e6;
+      --accent: #0d6efd;
+      --text: #212529;
+      --muted: #6c757d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 1.5rem;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 1.75rem; margin-top: 0; }
+    h2 { font-size: 1.2rem; margin-top: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.35rem; }
+    p.lead { color: var(--muted); font-size: 1rem; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.65rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #e9ecef; }
+    code { font-size: 0.85em; background: #e9ecef; padding: 0.1em 0.35em; border-radius: 0.25rem; }
+    .fk { color: #0a58ca; }
+    .note {
+      font-size: 0.875rem;
+      color: var(--muted);
+      border-left: 4px solid var(--accent);
+      padding-left: 0.75rem;
+      margin: 1rem 0;
+    }
+    pre.diagram {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+    ul.compact { margin: 0.5rem 0; padding-left: 1.25rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Задействованные таблицы БД (модуль «Сообщения»)</h1>
+    <p class="lead">
+      Описание таблиц SQL Server, которые использует функциональность внутренних сообщений:
+      переписка клиента с салоном и чат между сотрудниками (администратор / менеджер).
+    </p>
+    <p class="note">
+      Скрипт создания: <code>backend/CourseProjectAPI/Scripts/chat_tables.sql</code>.
+      Связанные сущности пользователей уже есть в основной схеме приложения (<code>Users</code>, <code>Roles</code>, <code>UserProfiles</code>).
+    </p>
+
+    <h2>Схема связей (упрощённо)</h2>
+    <pre class="diagram">┌─────────────────┐         ┌──────────────────────┐
+│     Users       │         │  ChatConversations   │
+│  (UserID PK)    │◄────────│  ClientUserId (FK)   │
+└────────┬────────┘         │  StaffKeyUser1 (FK)  │
+         │                  │  StaffKeyUser2 (FK)  │
+         │                  └──────────┬───────────┘
+         │                             │
+         │                  ┌──────────▼───────────┐
+         └──────────────────►  ChatMessages        │
+                            │  SenderUserId (FK)  │
+                            │  ChatConversationId │
+                            └─────────────────────┘</pre>
+
+    <h2>Таблица <code>ChatConversations</code></h2>
+    <div class="card">
+      <p>Один ряд — одна «тема» переписки: либо поддержка клиента, либо прямой чат двух сотрудников.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Колонка</th>
+            <th>Тип</th>
+            <th>Назначение</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ChatConversationId</code></td>
+            <td>INT, IDENTITY, PK</td>
+            <td>Идентификатор переписки</td>
+          </tr>
+          <tr>
+            <td><code>ConversationType</code></td>
+            <td>TINYINT</td>
+            <td><code>0</code> — клиент ↔ салон (<em>ClientSupport</em>); <code>1</code> — два сотрудника (<em>StaffDirect</em>)</td>
+          </tr>
+          <tr>
+            <td><code>ClientUserId</code></td>
+            <td>INT NULL, FK → <span class="fk">Users(UserID)</span></td>
+            <td>Для типа 0: клиент-владелец треда; уникален среди таких строк</td>
+          </tr>
+          <tr>
+            <td><code>StaffKeyUser1</code></td>
+            <td>INT NULL, FK → <span class="fk">Users(UserID)</span></td>
+            <td>Для типа 1: меньший из двух UserID участников</td>
+          </tr>
+          <tr>
+            <td><code>StaffKeyUser2</code></td>
+            <td>INT NULL, FK → <span class="fk">Users(UserID)</span></td>
+            <td>Для типа 1: больший из двух UserID участников</td>
+          </tr>
+          <tr>
+            <td><code>CreatedAt</code></td>
+            <td>DATETIME2</td>
+            <td>Время создания</td>
+          </tr>
+          <tr>
+            <td><code>UpdatedAt</code></td>
+            <td>DATETIME2</td>
+            <td>Обновляется при новом сообщении</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">
+        Уникальные индексы: по <code>ClientUserId</code> (где NOT NULL); по паре <code>(StaffKeyUser1, StaffKeyUser2)</code> для типа 1.
+      </p>
+    </div>
+
+    <h2>Таблица <code>ChatMessages</code></h2>
+    <div class="card">
+      <p>Отдельные сообщения внутри переписки.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Колонка</th>
+            <th>Тип</th>
+            <th>Назначение</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ChatMessageId</code></td>
+            <td>INT, IDENTITY, PK</td>
+            <td>Идентификатор сообщения</td>
+          </tr>
+          <tr>
+            <td><code>ChatConversationId</code></td>
+            <td>INT, FK → <span class="fk">ChatConversations</span></td>
+            <td>Принадлежность к треду; при удалении треда сообщения удаляются каскадом</td>
+          </tr>
+          <tr>
+            <td><code>SenderUserId</code></td>
+            <td>INT, FK → <span class="fk">Users(UserID)</span></td>
+            <td>Кто отправил</td>
+          </tr>
+          <tr>
+            <td><code>Body</code></td>
+            <td>NVARCHAR(2000)</td>
+            <td>Текст сообщения</td>
+          </tr>
+          <tr>
+            <td><code>CreatedAt</code></td>
+            <td>DATETIME2</td>
+            <td>Время отправки</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Связанные таблицы основного приложения</h2>
+    <div class="card">
+      <p>Модуль сообщений не создаёт эти таблицы, но ссылается на них:</p>
+      <ul class="compact">
+        <li><code>Users</code> — отправитель, клиент в треде, участники staff-чата</li>
+        <li><code>Roles</code> — роль пользователя (Client / Manager / Admin); логика API различает клиента и сотрудника</li>
+        <li><code>UserProfiles</code> — имя и фамилия для отображения в интерфейсе (подгружается API)</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

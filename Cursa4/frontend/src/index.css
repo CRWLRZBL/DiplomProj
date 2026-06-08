@@ -1,0 +1,273 @@
+/* index.css - исправленная версия */
+
+/* Сброс и базовая настройка */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* HTML и Body на всю высоту и ширину */
+html {
+  width: 100%;
+  min-height: 100vh; /* Изменено для правильной работы flexbox */
+  font-size: 16px;
+  overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+  /* Оптимизация масштабирования */
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #1a1a1a !important; /* Улучшенный контраст для лучшей читаемости (WCAG AA) */
+  line-height: 1.6;
+  overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+  max-width: 100vw; /* Ограничиваем максимальную ширину */
+  font-weight: 400;
+}
+
+/* Корневой элемент приложения */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+  max-width: 100vw; /* Ограничиваем максимальную ширину */
+}
+
+/* Базовые стили для ссылок */
+a {
+  color: #646cff;
+  text-decoration: inherit;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+/* Базовые стили для заголовков */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+/* Базовые стили для текста */
+p {
+  margin-bottom: 1rem;
+}
+
+/* Код и преформатированный текст */
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+  background-color: #f8f9fa;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+pre {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+/* Изображения */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Списки */
+ul, ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+/* Формы */
+input, button, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Утилиты для скринридеров */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Поддержка темной темы (опционально) */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #242424;
+    color: rgba(255, 255, 255, 0.87);
+  }
+  
+  a {
+    color: #646cff;
+  }
+  
+  a:hover {
+    color: #535bf2;
+  }
+  
+  code {
+    background-color: #2d2d2d;
+  }
+  
+  pre {
+    background-color: #2d2d2d;
+  }
+}
+
+/* Улучшение рендеринга шрифтов */
+* {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Улучшение производительности при скролле */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Улучшение доступности для фокуса */
+:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Улучшение для мобильных устройств */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Отключение выделения на мобильных устройствах */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Анимации для загрузки */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Плавный скролл */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Фикс для 100vh на мобильных устройствах */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Фикс для фуллскрин на iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Улучшение доступности для кнопок */
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Улучшение доступности для ссылок */
+[href]:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Сброс стилей для кнопок */
+button {
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  padding: 0;
+}
+
+/* Улучшение читаемости текста */
+p, li {
+  max-width: 65ch;
+}

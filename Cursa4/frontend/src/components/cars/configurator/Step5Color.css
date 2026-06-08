@@ -1,0 +1,111 @@
+.step5-color {
+  padding: 2rem 0;
+}
+
+.step-title {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #333;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.color-selection-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.car-image-section {
+  text-align: center;
+}
+
+.car-image-wrapper {
+  display: inline-block;
+  position: relative;
+  max-width: 100%;
+}
+
+.car-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  transition: filter 0.3s ease;
+}
+
+.color-palette-card {
+  margin-top: 2rem;
+}
+
+.color-swatches {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+}
+
+.color-swatch {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.color-swatch.selected {
+  border-color: #ff6b35;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.color-swatch.selected .checkmark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.color-info {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.color-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.color-price {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .step-title {
+    font-size: 1.5rem;
+  }
+
+  .car-image {
+    max-height: 300px;
+  }
+
+  .color-swatch {
+    width: 50px;
+    height: 50px;
+  }
+}
+

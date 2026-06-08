@@ -1,0 +1,116 @@
+.step6-summary {
+  padding: 2rem 0;
+}
+
+.step-title {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #333;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.summary-car-image {
+  height: 100%;
+}
+
+.summary-car-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.summary-details {
+  height: 100%;
+}
+
+.summary-model-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.summary-specs {
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1.5rem 0;
+}
+
+.spec-item {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #666;
+}
+
+.spec-item:last-child {
+  margin-bottom: 0;
+}
+
+.spec-item strong {
+  color: #333;
+  margin-right: 0.5rem;
+}
+
+.summary-price-section {
+  padding: 1.5rem 0;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.price-row:last-child {
+  border-bottom: none;
+}
+
+.price-row.total {
+  border-top: 2px solid #333;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+}
+
+.price-label {
+  font-size: 1rem;
+  color: #666;
+}
+
+.price-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.price-row.total .price-value {
+  font-size: 1.5rem;
+  color: #ff6b35;
+}
+
+.summary-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .step-title {
+    font-size: 1.5rem;
+  }
+
+  .summary-car-img {
+    max-height: 300px;
+  }
+
+  .summary-actions {
+    flex-direction: column;
+  }
+
+  .summary-actions button {
+    width: 100%;
+  }
+}
+

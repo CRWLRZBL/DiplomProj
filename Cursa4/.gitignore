@@ -1,0 +1,85 @@
+# ============================================
+# Общее
+# ============================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.swp
+*.swo
+*~
+*.tmp
+*.temp
+*.cache
+*.log
+logs/
+
+# IDE
+.idea/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# ============================================
+# Backend (.NET)
+# ============================================
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Tt]est[Rr]esult*/
+*.VisualState.xml
+TestResult.xml
+coverage*.json
+coverage*.xml
+*.coverage
+*.coveragexml
+*.binlog
+artifacts/
+*.nupkg
+*.snupkg
+
+# ============================================
+# Frontend (React/Vite)
+# ============================================
+node_modules/
+dist/
+dist-ssr/
+build/
+.pnp
+.pnp.js
+coverage/
+.nyc_output
+*.local
+
+# Env
+.env
+.env.*
+!.env.example
+
+# ============================================
+# Docker / БД
+# ============================================
+*.mdf
+*.ldf
+*.ndf
+*.bak
+*.backup
+
+# Загруженные файлы (сохраняем структуру папок)
+backend/CourseProjectAPI/wwwroot/uploads/**
+!backend/CourseProjectAPI/wwwroot/uploads/**/.gitkeep
+
+# ============================================
+# Диплом / черновики (не часть приложения)
+# ============================================
+docs/
+DIplom.md
+*.draft.md
+*.tmp.md

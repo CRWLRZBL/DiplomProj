@@ -1,0 +1,99 @@
+services:
+  # База данных SQL Server
+  db:
+    container_name: DBproject
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Pass1234
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - db_data:/var/opt/mssql
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Pass1234 -Q "SELECT 1" -C || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+  # Однократная инициализация БД (создание Autosalon + чат при первом запуске)
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db-init
+    user: root
+    environment:
+      - SA_PASSWORD=Pass1234
+      - DB_HOST=db
+    volumes:
+      - ./backend/CourseProjectAPI/database_full_script.sql:/init/database_full_script.sql:ro
+      - ./backend/CourseProjectAPI/Scripts/chat_tables.sql:/init/chat_tables.sql:ro
+      - ./backend/CourseProjectAPI/Scripts/catalog_columns.sql:/init/catalog_columns.sql:ro
+      - ./docker/db-init/run.sh:/init/run.sh:ro
+    entrypoint: ["/bin/bash", "-c", "tr -d '\\r' < /init/run.sh | bash -s"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: "no"
+
+  # Backend API (.NET)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-api
+    ports:
+      - "5171:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Autosalon;User Id=sa;Password=Pass1234;TrustServerCertificate=true;Connection Timeout=60;MultipleActiveResultSets=true;Encrypt=false;
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      # Любой HTTP-ответ от Kestrel (в т.ч. 404 на /) — значит API поднялся
+      test: ["CMD-SHELL", "curl -sS --max-time 3 -o /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 45s
+    volumes:
+      - catalog_uploads:/app/wwwroot/uploads/catalog
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Frontend (React/Vite)
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: frontend-app
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  catalog_uploads:
+
+networks:
+  app-network:
+    driver: bridge
+

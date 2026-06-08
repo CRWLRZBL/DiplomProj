@@ -1,0 +1,155 @@
+/* Внутренние страницы в стиле главной (светлый фон, коралловый акцент). */
+.dp-page {
+  background: #fff;
+  --dp-coral: #e96b5d;
+  --dp-coral-soft: #fde8e5;
+  --dp-peach: #fdf5f2;
+  --dp-text: #1a1a1a;
+  --dp-muted: #666;
+  --dp-radius-lg: 20px;
+  --dp-radius-md: 14px;
+  --dp-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  padding: clamp(1.5rem, 4vw, 2.75rem) 0 clamp(2.5rem, 5vw, 4rem);
+}
+
+.dp-pageHead {
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.dp-pageTitle {
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: var(--dp-text);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.dp-pageSub {
+  color: var(--dp-muted);
+  font-size: 1rem;
+  margin: 0;
+  max-width: 42ch;
+}
+
+.dp-card {
+  border: none;
+  border-radius: var(--dp-radius-lg);
+  box-shadow: var(--dp-shadow);
+  overflow: hidden;
+  background: #fff;
+}
+
+.dp-cardHeader {
+  background: var(--dp-peach);
+  border-bottom: 1px solid rgba(233, 107, 93, 0.12);
+  padding: 1rem 1.25rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--dp-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dp-cardBody {
+  padding: 1.25rem;
+}
+
+.dp-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--dp-coral) 0%, #d85a4c 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.75rem;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 8px 24px rgba(233, 107, 93, 0.35);
+}
+
+.dp-fieldLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dp-muted);
+  margin-bottom: 0.25rem;
+}
+
+.dp-fieldValue {
+  font-weight: 600;
+  color: var(--dp-text);
+  margin-bottom: 1rem;
+}
+
+.dp-tabs.nav-tabs {
+  border-bottom: 1px solid #eee;
+  padding: 0 1rem;
+  gap: 0.25rem;
+}
+
+.dp-tabs .nav-link {
+  border: none;
+  border-radius: 10px 10px 0 0;
+  color: var(--dp-muted);
+  font-weight: 600;
+  padding: 0.85rem 1rem;
+}
+
+.dp-tabs .nav-link.active {
+  color: var(--dp-text);
+  background: #fff;
+  border-bottom: 2px solid var(--dp-coral);
+}
+
+.dp-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--dp-coral-soft);
+  color: var(--dp-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.dp-authCard {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.dp-auth-switcher .dp-auth-tab-active,
+.dp-auth-switcher .btn-dealership-dark.dp-auth-tab-active {
+  color: #fff !important;
+  background-color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+}
+
+.dp-auth-switcher .btn-outline-secondary {
+  color: #212529 !important;
+  background-color: #f1f3f5 !important;
+  border-color: #dee2e6 !important;
+}
+
+.dp-auth-switcher .btn-outline-secondary:hover {
+  color: #212529 !important;
+  background-color: #e9ecef !important;
+}
+
+.dp-form .form-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--dp-text);
+}
+
+.dp-form .form-control {
+  border-radius: 10px;
+  border-color: #e5e5e5;
+  padding: 0.65rem 0.85rem;
+}
+
+.dp-form .form-control:focus {
+  border-color: var(--dp-coral);
+  box-shadow: 0 0 0 0.2rem rgba(233, 107, 93, 0.2);
+}

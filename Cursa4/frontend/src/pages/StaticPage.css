@@ -1,0 +1,84 @@
+/* Общие стили для статичных страниц (О компании, Контакты). */
+.static-page {
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.static-hero {
+  position: relative;
+  border-radius: 0 0 28px 28px;
+  overflow: hidden;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.25rem;
+  background-color: #1a1a1a;
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.72) 100%),
+    var(--static-hero-img, none);
+  background-size: cover;
+  background-position: center;
+  color: #fff !important;
+}
+
+.static-hero h1,
+.static-hero .display-6,
+.static-hero p,
+.static-hero nav,
+.static-hero nav a,
+.static-hero nav span {
+  color: #fff !important;
+}
+
+.static-hero h1,
+.static-hero .display-6 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
+}
+
+.static-body {
+  padding-top: 2.5rem;
+  padding-bottom: 3rem;
+}
+
+.static-body h2 {
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.static-body .lead-muted {
+  color: #555;
+  line-height: 1.65;
+  max-width: 65ch;
+}
+
+.static-map {
+  border: 0;
+  width: 100%;
+  min-height: 420px;
+  border-radius: 16px;
+  filter: none;
+}
+
+.contact-card {
+  border: 1px solid #eee;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  height: 100%;
+}
+
+.contact-card .card-title {
+  font-weight: 700;
+}
+
+.contact-card a {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.contact-card a:hover {
+  color: #e96b5d;
+}

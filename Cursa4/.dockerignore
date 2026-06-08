@@ -1,0 +1,26 @@
+# Git и IDE
+.git
+.gitignore
+.vscode
+.idea
+.vs
+
+# Документация
+docs
+*.md
+!README.md
+
+# Frontend — не копировать в контекст (собирается внутри Dockerfile)
+frontend/node_modules
+frontend/dist
+
+# Backend — артефакты сборки
+backend/**/bin
+backend/**/obj
+backend/CourseProjectAPI.Tests
+
+# Логи и временные файлы
+**/*.log
+**/*.tmp
+**/Thumbs.db
+.DS_Store

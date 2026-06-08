@@ -1,0 +1,278 @@
+/* Улучшения контрастности и читаемости текста */
+
+/* Базовые улучшения контраста - минимальный контраст 4.5:1 для WCAG AA */
+body {
+  color: #1a1a1a !important; /* Более темный цвет для лучшего контраста */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Улучшение контраста для заголовков */
+h1, h2, h3, h4, h5, h6 {
+  color: #1a1a1a !important;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Улучшение контраста для обычного текста */
+p, span, div, li, td, th {
+  color: #1a1a1a !important; /* Более темный для лучшего контраста */
+}
+
+/* Улучшение контраста для текста на светлом фоне */
+.text-dark,
+.text-dark * {
+  color: #1a1a1a !important;
+}
+
+.text-muted {
+  color: #495057 !important; /* Более темный для лучшего контраста (4.5:1) */
+  opacity: 1 !important;
+}
+
+/* Улучшение контраста для карточек */
+.card,
+.card-body {
+  color: #212529 !important;
+}
+
+.card-title,
+.card-title * {
+  color: #1a1a1a !important;
+  font-weight: 600;
+}
+
+.card-text {
+  color: #495057 !important;
+}
+
+/* Улучшение контраста для форм */
+.form-label {
+  color: #212529 !important;
+  font-weight: 500;
+}
+
+.form-control,
+.form-select {
+  color: #212529 !important;
+}
+
+.form-control::placeholder {
+  color: #6c757d !important;
+  opacity: 0.8;
+}
+
+/* Улучшение контраста для кнопок */
+.btn {
+  font-weight: 500;
+}
+
+.btn-primary {
+  color: #fff !important;
+}
+
+.btn-outline-primary {
+  color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.btn-outline-primary:hover {
+  color: #fff !important;
+  background-color: #0d6efd !important;
+}
+
+/* Улучшение контраста для Badge */
+.badge {
+  font-weight: 500;
+}
+
+.badge.bg-light {
+  color: #212529 !important;
+  background-color: #f8f9fa !important;
+}
+
+.badge.bg-primary {
+  color: #fff !important;
+}
+
+.badge.bg-success {
+  color: #fff !important;
+}
+
+/* Улучшение контраста для таблиц */
+.table {
+  color: #212529 !important;
+}
+
+.table thead th {
+  color: #1a1a1a !important;
+  font-weight: 600;
+  background-color: #f8f9fa !important;
+}
+
+.table tbody td {
+  color: #212529 !important;
+}
+
+/* Улучшение контраста для Alert */
+.alert {
+  color: #212529 !important;
+}
+
+.alert-danger {
+  background-color: #f8d7da !important;
+  border-color: #f5c2c7 !important;
+  color: #842029 !important;
+}
+
+.alert-success {
+  background-color: #d1e7dd !important;
+  border-color: #badbcc !important;
+  color: #0f5132 !important;
+}
+
+.alert-warning {
+  background-color: #fff3cd !important;
+  border-color: #ffecb5 !important;
+  color: #664d03 !important;
+}
+
+.alert-info {
+  background-color: #cff4fc !important;
+  border-color: #b6effb !important;
+  color: #055160 !important;
+}
+
+/* Улучшение контраста для ссылок */
+a {
+  color: #0d6efd !important;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #0a58ca !important;
+  text-decoration: underline;
+}
+
+/* Улучшение контраста для списков */
+.list-group-item {
+  color: #212529 !important;
+}
+
+/* Улучшение контраста для навигации (кроме темного навбара и активных pill) */
+.nav-link:not(.navbar-dark .nav-link):not(.navbar.bg-dark .nav-link):not(.active) {
+  color: #212529 !important;
+}
+
+.nav-link:not(.navbar-dark .nav-link):not(.navbar.bg-dark .nav-link):not(.active):hover {
+  color: #0d6efd !important;
+}
+
+.nav-pills .nav-link.active,
+.admin-page .nav-pills .nav-link.active {
+  color: #fff !important;
+  background-color: #0d6efd !important;
+  text-decoration: none !important;
+}
+
+.admin-page .nav-pills .nav-link.active:hover,
+.nav-pills .nav-link.active:hover {
+  color: #fff !important;
+}
+
+/* Улучшение контраста для модальных окон */
+.modal-title {
+  color: #1a1a1a !important;
+  font-weight: 600;
+}
+
+.modal-body {
+  color: #212529 !important;
+}
+
+/* Улучшение контраста для dropdown */
+.dropdown-menu {
+  color: #212529 !important;
+}
+
+.dropdown-item {
+  color: #212529 !important;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa !important;
+  color: #1a1a1a !important;
+}
+
+/* Минимальный контраст для WCAG AA */
+.text-muted {
+  color: #6c757d !important; /* Контраст 4.5:1 на белом фоне */
+}
+
+/* Улучшение читаемости для мелкого текста */
+small,
+.small {
+  color: #495057 !important;
+  font-size: 0.875rem;
+}
+
+/* Улучшение контраста для disabled элементов */
+.form-control:disabled,
+.btn:disabled {
+  opacity: 0.65;
+  color: #6c757d !important;
+}
+
+/* Улучшение контраста для placeholder */
+::placeholder {
+  color: #6c757d !important;
+  opacity: 0.8;
+}
+
+/* Улучшение контраста для input focus */
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  color: #212529 !important;
+}
+
+/* Улучшение контраста для breadcrumb */
+.breadcrumb {
+  color: #6c757d !important;
+}
+
+.breadcrumb-item.active {
+  color: #212529 !important;
+}
+
+/* Улучшение контраста для pagination */
+.page-link {
+  color: #0d6efd !important;
+}
+
+.page-item.active .page-link {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #fff !important;
+}
+
+/* Улучшение контраста для tooltip */
+.tooltip {
+  color: #fff !important;
+}
+
+/* Улучшение контраста для popover */
+.popover {
+  color: #212529 !important;
+}
+
+.popover-header {
+  background-color: #f8f9fa !important;
+  color: #1a1a1a !important;
+  font-weight: 600;
+}
+
+.popover-body {
+  color: #212529 !important;
+}
+
