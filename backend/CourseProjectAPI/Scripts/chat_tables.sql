@@ -1,7 +1,7 @@
 -- Переписки на сайте (клиент ↔ салон, сотрудник ↔ сотрудник).
--- Выполнить в БД автосалона один раз после развёртывания API.
+-- Идемпотентно: можно выполнять повторно при развёртывании.
 
-IF OBJECT_ID(N'dbo.ChatMessages', N'U') IS NULL
+IF OBJECT_ID(N'dbo.ChatConversations', N'U') IS NULL
 BEGIN
     CREATE TABLE dbo.ChatConversations (
         ChatConversationId INT IDENTITY(1,1) NOT NULL,
@@ -16,15 +16,38 @@ BEGIN
         CONSTRAINT FK_ChatConversations_StaffKeyUser1 FOREIGN KEY (StaffKeyUser1) REFERENCES dbo.Users (UserID),
         CONSTRAINT FK_ChatConversations_StaffKeyUser2 FOREIGN KEY (StaffKeyUser2) REFERENCES dbo.Users (UserID)
     );
+END
+GO
 
+IF OBJECT_ID(N'dbo.ChatConversations', N'U') IS NOT NULL
+    AND NOT EXISTS (
+        SELECT 1 FROM sys.indexes
+        WHERE name = N'IX_ChatConversations_ClientUserId'
+          AND object_id = OBJECT_ID(N'dbo.ChatConversations')
+    )
+BEGIN
     CREATE UNIQUE INDEX IX_ChatConversations_ClientUserId
         ON dbo.ChatConversations (ClientUserId)
         WHERE ClientUserId IS NOT NULL;
+END
+GO
 
+IF OBJECT_ID(N'dbo.ChatConversations', N'U') IS NOT NULL
+    AND NOT EXISTS (
+        SELECT 1 FROM sys.indexes
+        WHERE name = N'IX_ChatConversations_StaffPair'
+          AND object_id = OBJECT_ID(N'dbo.ChatConversations')
+    )
+BEGIN
     CREATE UNIQUE INDEX IX_ChatConversations_StaffPair
         ON dbo.ChatConversations (StaffKeyUser1, StaffKeyUser2)
         WHERE ConversationType = 1 AND StaffKeyUser1 IS NOT NULL AND StaffKeyUser2 IS NOT NULL;
+END
+GO
 
+IF OBJECT_ID(N'dbo.ChatMessages', N'U') IS NULL
+    AND OBJECT_ID(N'dbo.ChatConversations', N'U') IS NOT NULL
+BEGIN
     CREATE TABLE dbo.ChatMessages (
         ChatMessageId       INT IDENTITY(1,1) NOT NULL,
         ChatConversationId  INT NOT NULL,

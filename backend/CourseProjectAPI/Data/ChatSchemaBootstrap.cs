@@ -10,7 +10,7 @@ public static class ChatSchemaBootstrap
     public static async Task EnsureTablesAsync(AutoSalonContext context, ILogger logger, CancellationToken ct = default)
     {
         const string sql = """
-            IF OBJECT_ID(N'dbo.ChatMessages', N'U') IS NULL
+            IF OBJECT_ID(N'dbo.ChatConversations', N'U') IS NULL
             BEGIN
                 CREATE TABLE dbo.ChatConversations (
                     ChatConversationId INT IDENTITY(1,1) NOT NULL,
@@ -25,15 +25,35 @@ public static class ChatSchemaBootstrap
                     CONSTRAINT FK_ChatConversations_StaffKeyUser1 FOREIGN KEY (StaffKeyUser1) REFERENCES dbo.Users (UserID),
                     CONSTRAINT FK_ChatConversations_StaffKeyUser2 FOREIGN KEY (StaffKeyUser2) REFERENCES dbo.Users (UserID)
                 );
+            END
 
+            IF OBJECT_ID(N'dbo.ChatConversations', N'U') IS NOT NULL
+                AND NOT EXISTS (
+                    SELECT 1 FROM sys.indexes
+                    WHERE name = N'IX_ChatConversations_ClientUserId'
+                      AND object_id = OBJECT_ID(N'dbo.ChatConversations')
+                )
+            BEGIN
                 CREATE UNIQUE INDEX IX_ChatConversations_ClientUserId
                     ON dbo.ChatConversations (ClientUserId)
                     WHERE ClientUserId IS NOT NULL;
+            END
 
+            IF OBJECT_ID(N'dbo.ChatConversations', N'U') IS NOT NULL
+                AND NOT EXISTS (
+                    SELECT 1 FROM sys.indexes
+                    WHERE name = N'IX_ChatConversations_StaffPair'
+                      AND object_id = OBJECT_ID(N'dbo.ChatConversations')
+                )
+            BEGIN
                 CREATE UNIQUE INDEX IX_ChatConversations_StaffPair
                     ON dbo.ChatConversations (StaffKeyUser1, StaffKeyUser2)
                     WHERE ConversationType = 1 AND StaffKeyUser1 IS NOT NULL AND StaffKeyUser2 IS NOT NULL;
+            END
 
+            IF OBJECT_ID(N'dbo.ChatMessages', N'U') IS NULL
+                AND OBJECT_ID(N'dbo.ChatConversations', N'U') IS NOT NULL
+            BEGIN
                 CREATE TABLE dbo.ChatMessages (
                     ChatMessageId       INT IDENTITY(1,1) NOT NULL,
                     ChatConversationId  INT NOT NULL,
