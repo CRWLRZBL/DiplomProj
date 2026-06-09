@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Alert, Modal } from 'react-bootstrap';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Container, Row, Col, Form, Button, Alert, Modal, Card, Badge, InputGroup } from 'react-bootstrap';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { USER_ROLES } from '../utils/constants';
+import { USER_ROLES, PAGINATION } from '../utils/constants';
 import { carService } from '../services/api/carService';
 import { Car, SaveCarListing } from '../services/models/car';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import Pagination from '../components/common/Pagination';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { resolvePublicImageUrl, handleCatalogImageError } from '../utils/catalogImage';
 import {
@@ -13,6 +14,24 @@ import {
   DEFAULT_CONDITION_NEW,
   DEFAULT_CONDITION_USED,
 } from '../constants/carConditions';
+import {
+  BODY_TYPE_OPTIONS,
+  DRIVE_OPTIONS,
+  FUEL_TYPE_OPTIONS,
+  TRANSMISSION_OPTIONS,
+  DEFAULT_CATALOG_COLORS,
+} from '../constants/vehicleForm';
+import {
+  validateVin,
+  validateYear,
+  validatePositiveNumber,
+  validateEngineVolume,
+  parseNonNegativeInt,
+  parsePositiveDecimal,
+  MAX_CAR_YEAR,
+  MIN_CAR_YEAR,
+} from '../utils/validation';
+import { getApiErrorMessage } from '../utils/apiError';
 
 const emptyForm = (): SaveCarListing => ({
   listingType: 'New',
@@ -22,7 +41,7 @@ const emptyForm = (): SaveCarListing => ({
   bodyType: '',
   basePrice: 0,
   showPriceFrom: true,
-  color: 'Не указан',
+  color: '',
   status: 'Available',
   vin: '',
   mileage: 0,
@@ -85,6 +104,11 @@ const CatalogManage: React.FC = () => {
   const [photoGallery, setPhotoGallery] = useState<string[]>([]);
   const [uploadingMain, setUploadingMain] = useState(false);
   const [uploadingExtra, setUploadingExtra] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [colorOptions, setColorOptions] = useState<string[]>([...DEFAULT_CATALOG_COLORS]);
+  const itemsPerPage = PAGINATION.DEFAULT_PAGE_SIZE;
 
   const applyPhotoGallery = (urls: string[]) => {
     const unique = urls.map((u) => resolvePublicImageUrl(u)).filter(Boolean);
@@ -113,6 +137,14 @@ const CatalogManage: React.FC = () => {
     if (isStaff) loadAll();
   }, [isStaff]);
 
+  useEffect(() => {
+    void carService.getColors().then((colors) => {
+      if (colors.length > 0) {
+        setColorOptions(colors.map((c) => c.name));
+      }
+    });
+  }, []);
+
   const loadAll = async () => {
     try {
       setLoading(true);
@@ -124,6 +156,22 @@ const CatalogManage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const filteredCars = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return cars;
+    return cars.filter(
+      (c) =>
+        `${c.carId} ${c.brandName} ${c.modelName} ${c.title ?? ''} ${c.vin ?? ''}`
+          .toLowerCase()
+          .includes(q)
+    );
+  }, [cars, searchQuery]);
+
+  const paginatedCars = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filteredCars.slice(start, start + itemsPerPage);
+  }, [filteredCars, page, itemsPerPage]);
 
   if (!user || !isStaff) {
     return <Navigate to="/catalog" replace />;
@@ -182,14 +230,35 @@ const CatalogManage: React.FC = () => {
     setSuccess('');
   };
 
+  const validateForm = (): string | null => {
+    if (!form.brandName.trim()) return 'Укажите марку автомобиля';
+    if (!form.modelName.trim()) return 'Укажите модель автомобиля';
+    const vinErr = validateVin(form.vin ?? '');
+    if (vinErr) return vinErr;
+    const priceErr = validatePositiveNumber(form.basePrice, 'Цена');
+    if (priceErr) return priceErr;
+    const yearErr = validateYear(form.modelYear);
+    if (yearErr) return yearErr;
+    if (form.listingType === 'Used') {
+      const mileageErr = validatePositiveNumber(form.mileage, 'Пробег');
+      if (mileageErr) return mileageErr;
+    }
+    const volumeErr = validateEngineVolume(form.engineCapacity);
+    if (volumeErr) return volumeErr;
+    if (!form.color?.trim()) return 'Выберите цвет';
+    if (!form.bodyType) return 'Выберите тип кузова';
+    if (!form.fuelType) return 'Выберите тип топлива';
+    if (!form.transmission) return 'Выберите коробку передач';
+    if (!form.driveType) return 'Выберите привод';
+    return null;
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.listingType === 'Used') {
-      const vin = (form.vin ?? '').trim();
-      if (vin.length < 17) {
-        setError('Для авто с пробегом укажите VIN из 17 символов.');
-        return;
-      }
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
     }
     setSaving(true);
     setError('');
@@ -211,8 +280,8 @@ const CatalogManage: React.FC = () => {
       }
       setShowForm(false);
       await loadAll();
-    } catch {
-      setError('Не удалось сохранить. Проверьте данные и подключение.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Не удалось сохранить карточку.'));
     } finally {
       setSaving(false);
     }
@@ -249,48 +318,112 @@ const CatalogManage: React.FC = () => {
         </div>
       </div>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && !showForm && <Alert variant="danger">{error}</Alert>}
       {success && <Alert variant="success">{success}</Alert>}
 
-      <Table responsive hover className="align-middle bg-white shadow-sm">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Название</th>
-            <th>Тип</th>
-            <th>Цена</th>
-            <th>Статус</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {cars.map((c) => (
-            <tr key={c.carId}>
-              <td>{c.carId}</td>
-              <td>
-                <Link to={`/catalog/${c.carId}`}>{c.title || `${c.brandName} ${c.modelName}`}</Link>
-              </td>
-              <td>{c.listingType === 'Used' ? 'Б/У' : 'Новый'}</td>
-              <td>{c.basePrice.toLocaleString('ru-RU')} ₽</td>
-              <td>
-                {c.isPublished ? (
-                  <span className="text-success">Опубликован</span>
-                ) : (
-                  <span className="text-muted">Скрыт</span>
-                )}
-              </td>
-              <td className="text-end">
-                <Button size="sm" variant="outline-dark" className="me-2" onClick={() => openEdit(c)}>
-                  Изменить
-                </Button>
-                <Button size="sm" variant="outline-danger" onClick={() => void handleDeleteListing(c.carId)}>
-                  Удалить
-                </Button>
-              </td>
-            </tr>
+      <Row className="mb-3 g-2 align-items-center">
+        <Col md={6}>
+          <InputGroup>
+            <InputGroup.Text>🔍</InputGroup.Text>
+            <Form.Control
+              type="search"
+              placeholder="Поиск по марке, модели, VIN или ID…"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPage(1);
+              }}
+            />
+          </InputGroup>
+        </Col>
+        <Col md={6} className="text-md-end text-muted small">
+          Найдено: {filteredCars.length}
+        </Col>
+      </Row>
+
+      {paginatedCars.length === 0 ? (
+        <Alert variant="light" className="text-center text-muted">
+          {searchQuery ? 'Ничего не найдено по вашему запросу.' : 'Карточек пока нет — добавьте первый автомобиль.'}
+        </Alert>
+      ) : (
+        <Row className="g-3">
+          {paginatedCars.map((c) => (
+            <Col key={c.carId} xs={12} sm={6} lg={4} xl={3}>
+              <Card
+                className={`catalog-manage-card h-100 shadow-sm ${selectedId === c.carId ? 'selected' : ''}`}
+                onClick={() => setSelectedId(c.carId)}
+              >
+                <div
+                  className="catalog-listing-image-wrap"
+                  style={{ height: 160 }}
+                >
+                  <img
+                    src={resolvePublicImageUrl(c.imageUrl || c.imageUrls?.[0] || '')}
+                    alt=""
+                    onError={handleCatalogImageError}
+                  />
+                </div>
+                <Card.Body className="p-3">
+                  <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <Badge bg={c.listingType === 'Used' ? 'secondary' : 'dark'}>
+                      {c.listingType === 'Used' ? 'Б/У' : 'Новый'}
+                    </Badge>
+                    <span className="text-muted small">#{c.carId}</span>
+                  </div>
+                  <Card.Title className="h6 mb-1" style={{ minHeight: '2.6em' }}>
+                    <Link to={`/catalog/${c.carId}`} onClick={(e) => e.stopPropagation()}>
+                      {c.title || `${c.brandName} ${c.modelName}`}
+                    </Link>
+                  </Card.Title>
+                  <div className="fw-bold mb-2">{c.basePrice.toLocaleString('ru-RU')} ₽</div>
+                  <div className="small mb-3">
+                    {c.isPublished ? (
+                      <span className="text-success">Опубликован</span>
+                    ) : (
+                      <span className="text-muted">Скрыт</span>
+                    )}
+                  </div>
+                  <div className="d-flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-dark"
+                      className="flex-fill"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEdit(c);
+                      }}
+                    >
+                      Изменить
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline-danger"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void handleDeleteListing(c.carId);
+                      }}
+                    >
+                      Удалить
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
           ))}
-        </tbody>
-      </Table>
+        </Row>
+      )}
+
+      {filteredCars.length > itemsPerPage && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={page}
+            totalPages={Math.ceil(filteredCars.length / itemsPerPage)}
+            onPageChange={setPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredCars.length}
+          />
+        </div>
+      )}
 
       <Modal
         show={showForm}
@@ -299,7 +432,9 @@ const CatalogManage: React.FC = () => {
         centered
         scrollable
         backdrop={false}
+        enforceFocus={false}
         className="consultation-modal"
+        dialogClassName="consultation-modal-dialog modal-dialog-centered"
         container={typeof document !== 'undefined' ? document.body : undefined}
       >
         <Modal.Header closeButton>
@@ -307,6 +442,11 @@ const CatalogManage: React.FC = () => {
         </Modal.Header>
         <Form onSubmit={handleSave}>
           <Modal.Body>
+            {error && showForm && (
+              <Alert variant="danger" className="py-2 small">
+                {error}
+              </Alert>
+            )}
             <Row className="g-3">
               <Col md={4}>
                 <Form.Group>
@@ -364,13 +504,34 @@ const CatalogManage: React.FC = () => {
               </Col>
               <Col md={4}>
                 <Form.Group>
+                  <Form.Label>Цвет *</Form.Label>
+                  <Form.Select
+                    required
+                    value={form.color}
+                    onChange={(e) => setForm({ ...form, color: e.target.value })}
+                  >
+                    <option value="">Выберите цвет</option>
+                    {colorOptions.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group>
                   <Form.Label>Цена, ₽ *</Form.Label>
                   <Form.Control
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     required
-                    min={0}
-                    value={form.basePrice || ''}
-                    onChange={(e) => setForm({ ...form, basePrice: Number(e.target.value) })}
+                    value={form.basePrice ? String(form.basePrice) : ''}
+                    onChange={(e) => {
+                      const n = parseNonNegativeInt(e.target.value);
+                      setForm({ ...form, basePrice: n ?? 0 });
+                    }}
+                    placeholder="Например, 1000000"
                   />
                 </Form.Group>
               </Col>
@@ -385,33 +546,40 @@ const CatalogManage: React.FC = () => {
                 <Form.Group>
                   <Form.Label>Пробег, км</Form.Label>
                   <Form.Control
-                    type="number"
-                    min={0}
-                    value={form.mileage ?? 0}
-                    onChange={(e) => setForm({ ...form, mileage: Number(e.target.value) })}
+                    type="text"
+                    inputMode="numeric"
+                    value={form.mileage != null ? String(form.mileage) : ''}
+                    onChange={(e) => {
+                      const n = parseNonNegativeInt(e.target.value);
+                      setForm({ ...form, mileage: n ?? 0 });
+                    }}
                     disabled={form.listingType === 'New'}
+                    placeholder="0"
                   />
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label>Год</Form.Label>
+                  <Form.Label>Год *</Form.Label>
                   <Form.Control
                     type="number"
+                    min={MIN_CAR_YEAR}
+                    max={MAX_CAR_YEAR}
                     value={form.modelYear ?? ''}
                     onChange={(e) => setForm({ ...form, modelYear: Number(e.target.value) })}
+                    required
                   />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>VIN {form.listingType === 'Used' ? '*' : ''}</Form.Label>
+                  <Form.Label>VIN *</Form.Label>
                   <Form.Control
                     value={form.vin ?? ''}
                     onChange={(e) => setForm({ ...form, vin: e.target.value.toUpperCase() })}
                     placeholder="17 символов, например XTA21144012345678"
                     maxLength={17}
-                    required={form.listingType === 'Used'}
+                    required
                   />
                   <Form.Text className="text-muted">
                     Уникальный номер кузова — отображается в карточке и админке.
@@ -440,54 +608,85 @@ const CatalogManage: React.FC = () => {
               </Col>
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label>Кузов</Form.Label>
-                  <Form.Control
+                  <Form.Label>Кузов *</Form.Label>
+                  <Form.Select
+                    required
                     value={form.bodyType}
                     onChange={(e) => setForm({ ...form, bodyType: e.target.value })}
-                  />
+                  >
+                    <option value="">Выберите тип кузова</option>
+                    {BODY_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label>Топливо</Form.Label>
-                  <Form.Control
+                  <Form.Label>Топливо *</Form.Label>
+                  <Form.Select
+                    required
                     value={form.fuelType}
                     onChange={(e) => setForm({ ...form, fuelType: e.target.value })}
-                  />
+                  >
+                    <option value="">Выберите топливо</option>
+                    {FUEL_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Объём, л</Form.Label>
                   <Form.Control
-                    type="number"
-                    step="0.1"
+                    type="text"
+                    inputMode="decimal"
                     value={form.engineCapacity ?? ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        engineCapacity: e.target.value ? Number(e.target.value) : null,
-                      })
-                    }
+                    onChange={(e) => {
+                      const n = parsePositiveDecimal(e.target.value);
+                      setForm({ ...form, engineCapacity: n });
+                    }}
+                    placeholder="Например, 1.6"
                   />
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label>КПП</Form.Label>
-                  <Form.Control
+                  <Form.Label>КПП *</Form.Label>
+                  <Form.Select
+                    required
                     value={form.transmission}
                     onChange={(e) => setForm({ ...form, transmission: e.target.value })}
-                  />
+                  >
+                    <option value="">Выберите КПП</option>
+                    {TRANSMISSION_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label>Привод</Form.Label>
-                  <Form.Control
+                  <Form.Label>Привод *</Form.Label>
+                  <Form.Select
+                    required
                     value={form.driveType}
                     onChange={(e) => setForm({ ...form, driveType: e.target.value })}
-                  />
+                  >
+                    <option value="">Выберите привод</option>
+                    {DRIVE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={4}>
@@ -503,15 +702,14 @@ const CatalogManage: React.FC = () => {
                 <Form.Group>
                   <Form.Label>Скидка трейд-ин, ₽</Form.Label>
                   <Form.Control
-                    type="number"
-                    min={0}
+                    type="text"
+                    inputMode="numeric"
                     value={form.tradeInDiscount ?? ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        tradeInDiscount: e.target.value ? Number(e.target.value) : null,
-                      })
-                    }
+                    onChange={(e) => {
+                      const n = parseNonNegativeInt(e.target.value);
+                      setForm({ ...form, tradeInDiscount: n });
+                    }}
+                    placeholder="0"
                   />
                 </Form.Group>
               </Col>
@@ -519,15 +717,14 @@ const CatalogManage: React.FC = () => {
                 <Form.Group>
                   <Form.Label>Скидка за кредит, ₽</Form.Label>
                   <Form.Control
-                    type="number"
-                    min={0}
+                    type="text"
+                    inputMode="numeric"
                     value={form.creditDiscount ?? ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        creditDiscount: e.target.value ? Number(e.target.value) : null,
-                      })
-                    }
+                    onChange={(e) => {
+                      const n = parseNonNegativeInt(e.target.value);
+                      setForm({ ...form, creditDiscount: n });
+                    }}
+                    placeholder="0"
                   />
                 </Form.Group>
               </Col>

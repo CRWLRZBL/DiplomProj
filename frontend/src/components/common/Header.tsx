@@ -1,15 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Icon from './Icon';
 import { MARKETING_LOGO_JPG } from '../../constants/marketingAssets';
 import { SITE_NAME, SITE_LOCATIONS } from '../../constants/siteContacts';
+import { USER_ROLES } from '../../utils/constants';
 import './Header.css';
+
+const STAFF_VIEW_KEY = 'autosalon-staff-view';
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [staffView, setStaffView] = useState(false);
+
+  const isStaff =
+    user?.roleName === USER_ROLES.ADMIN || user?.roleName === USER_ROLES.MANAGER;
+  const isAdmin = user?.roleName === USER_ROLES.ADMIN;
+
+  useEffect(() => {
+    if (!isStaff) {
+      setStaffView(false);
+      return;
+    }
+    const saved = localStorage.getItem(STAFF_VIEW_KEY);
+    setStaffView(saved !== 'client');
+  }, [isStaff, user?.roleName]);
+
+  const toggleStaffView = (mode: 'staff' | 'client') => {
+    const next = mode === 'staff';
+    setStaffView(next);
+    localStorage.setItem(STAFF_VIEW_KEY, next ? 'staff' : 'client');
+    if (next) {
+      navigate(isAdmin ? '/admin' : '/catalog/manage');
+    } else {
+      navigate('/catalog');
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -58,46 +86,85 @@ const Header: React.FC = () => {
           <Navbar.Toggle aria-controls="main-nav" className="ms-auto" />
           <Navbar.Collapse id="main-nav" className="site-nav">
             <Nav className="me-auto my-2 my-lg-0 mx-lg-auto">
-              <NavDropdown title="Купить авто" id="nav-buy">
-                <NavDropdown.Item as={Link} to="/catalog">
-                  Новые автомобили
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/catalog?type=used">
-                  Авто с пробегом
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item as={Link} to="/configurator">
-                  Онлайн‑конфигуратор
-                </NavDropdown.Item>
-              </NavDropdown>
+              {isStaff && staffView ? (
+                <>
+                  <Nav.Link as={Link} to="/catalog/manage">
+                    Управление каталогом
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/messages">
+                    Сообщения
+                  </Nav.Link>
+                  {isAdmin && (
+                    <Nav.Link as={Link} to="/admin">
+                      Админ-панель
+                    </Nav.Link>
+                  )}
+                  <NavDropdown title="Вид клиента" id="nav-client-view">
+                    <NavDropdown.Item onClick={() => toggleStaffView('client')}>
+                      Каталог для клиентов
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/configurator">
+                      Конфигуратор
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/">
+                      Главная страница
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                </>
+              ) : (
+                <>
+                  <NavDropdown title="Купить авто" id="nav-buy">
+                    <NavDropdown.Item as={Link} to="/catalog">
+                      Новые автомобили
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/catalog?type=used">
+                      Авто с пробегом
+                    </NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item as={Link} to="/configurator">
+                      Онлайн‑конфигуратор
+                    </NavDropdown.Item>
+                  </NavDropdown>
 
-              <NavDropdown title="Покупателям" id="nav-services">
-                <NavDropdown.Item as={Link} to={user ? '/order' : '/profile?redirect=/order'}>
-                  Оформить заказ
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to={user ? '/messages' : '/profile?redirect=/messages'}>
-                  Сообщения
-                </NavDropdown.Item>
-              </NavDropdown>
+                  <Nav.Link as={Link} to={user ? '/order' : '/profile?redirect=/order'}>
+                    Оформить заказ
+                  </Nav.Link>
+                  <Nav.Link as={Link} to={user ? '/messages' : '/profile?redirect=/messages'}>
+                    Сообщения
+                  </Nav.Link>
 
-              <Nav.Link as={Link} to="/about">
-                О компании
-              </Nav.Link>
-              <Nav.Link as={Link} to="/contacts">
-                Контакты
-              </Nav.Link>
+                  {isStaff && (
+                    <NavDropdown title="Персонал" id="nav-staff">
+                      <NavDropdown.Item onClick={() => toggleStaffView('staff')}>
+                        Режим персонала
+                      </NavDropdown.Item>
+                      <NavDropdown.Item as={Link} to="/catalog/manage">
+                        Управление каталогом
+                      </NavDropdown.Item>
+                      {isAdmin && (
+                        <NavDropdown.Item as={Link} to="/admin">
+                          Админ-панель
+                        </NavDropdown.Item>
+                      )}
+                    </NavDropdown>
+                  )}
+
+                  <Nav.Link as={Link} to="/about">
+                    О компании
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/contacts">
+                    Контакты
+                  </Nav.Link>
+                </>
+              )}
             </Nav>
 
             <div className="site-header-actions d-flex align-items-center gap-2 ms-lg-2">
-              <Button variant="outline-secondary" className="d-none d-md-inline-flex" onClick={openConsultation}>
-                <Icon name="phone" className="me-2" style={{ verticalAlign: 'middle' }} />
-                Консультация
-              </Button>
-
               <button
                 type="button"
                 className="site-header-call"
-                aria-label="Позвонить"
+                aria-label="Получить консультацию"
+                title="Консультация"
                 onClick={openConsultation}
               >
                 <Icon name="call" style={{ fontSize: '1.35rem' }} />
@@ -106,18 +173,20 @@ const Header: React.FC = () => {
               {user ? (
                 <NavDropdown
                   align="end"
-                  title={
-                    user.roleName === 'Admin'
-                      ? `${user.firstName} ${user.lastName}`
-                      : `${user.firstName} ${user.lastName}`
-                  }
+                  title={`${user.firstName} ${user.lastName}`}
                   id="user-dropdown"
                 >
                   <NavDropdown.Item as={Link} to="/profile">
                     <Icon name="person" className="me-2" style={{ verticalAlign: 'middle' }} />
                     Мой профиль
                   </NavDropdown.Item>
-                  {user.roleName === 'Admin' && (
+                  {isStaff && (
+                    <NavDropdown.Item onClick={() => toggleStaffView(staffView ? 'client' : 'staff')}>
+                      <Icon name="swap_horiz" className="me-2" style={{ verticalAlign: 'middle' }} />
+                      {staffView ? 'Вид клиента' : 'Режим персонала'}
+                    </NavDropdown.Item>
+                  )}
+                  {isAdmin && (
                     <>
                       <NavDropdown.Divider />
                       <NavDropdown.Item as={Link} to="/admin">

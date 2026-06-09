@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Form } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
-import { USER_ROLE_LABELS } from '../../utils/constants';
+import { USER_ROLE_LABELS, USER_ROLES } from '../../utils/constants';
 import Icon from '../common/Icon';
+import {
+  normalizePhone,
+  validateName,
+  validatePhone,
+} from '../../utils/validation';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 const ProfileEditor: React.FC = () => {
   const { user, updateProfile } = useAuth();
@@ -25,10 +31,20 @@ const ProfileEditor: React.FC = () => {
     });
   }, [user]);
 
+  const phoneFormatted = useMemo(() => normalizePhone(form.phone), [form.phone]);
+  const phoneError = form.phone.trim() ? validatePhone(phoneFormatted) : null;
+  const firstNameError = form.firstName.trim() ? validateName(form.firstName, 'Имя') : null;
+  const lastNameError = form.lastName.trim() ? validateName(form.lastName, 'Фамилия') : null;
+
   if (!user) return null;
 
   const initials = `${(user.firstName || '').charAt(0)}${(user.lastName || '').charAt(0) || 'U'}`;
   const roleLabel = USER_ROLE_LABELS[user.roleName] ?? user.roleName;
+  const isAdmin = user.roleName === USER_ROLES.ADMIN;
+
+  const emailHint = isAdmin
+    ? 'Смена email выполняется другим администратором системы. Заявку через сайт подать нельзя — обратитесь к коллеге с правами администратора.'
+    : 'Email изменяется через администратора. Для смены почты обратитесь в салон или напишите менеджеру в разделе «Сообщения».';
 
   const handleCancel = () => {
     setForm({
@@ -43,22 +59,38 @@ const ProfileEditor: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
     setError('');
     setSuccess('');
+
+    const fnErr = validateName(form.firstName, 'Имя');
+    if (fnErr) {
+      setError(fnErr);
+      return;
+    }
+    const lnErr = validateName(form.lastName, 'Фамилия');
+    if (lnErr) {
+      setError(lnErr);
+      return;
+    }
+    if (form.phone.trim()) {
+      const phErr = validatePhone(phoneFormatted);
+      if (phErr) {
+        setError(phErr);
+        return;
+      }
+    }
+
+    setSaving(true);
     try {
       await updateProfile({
         firstName: form.firstName.trim(),
         lastName: form.lastName.trim(),
-        phone: form.phone.trim(),
+        phone: form.phone.trim() ? phoneFormatted : '',
       });
       setSuccess('Данные профиля сохранены');
       setEditing(false);
     } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
-        'Не удалось сохранить изменения';
-      setError(msg);
+      setError(getApiErrorMessage(err, 'Не удалось сохранить изменения.'));
     } finally {
       setSaving(false);
     }
@@ -94,7 +126,9 @@ const ProfileEditor: React.FC = () => {
               onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
               required
               maxLength={100}
+              isInvalid={!!firstNameError}
             />
+            <Form.Control.Feedback type="invalid">{firstNameError}</Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Фамилия</Form.Label>
@@ -103,21 +137,26 @@ const ProfileEditor: React.FC = () => {
               onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
               required
               maxLength={100}
+              isInvalid={!!lastNameError}
             />
+            <Form.Control.Feedback type="invalid">{lastNameError}</Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Телефон</Form.Label>
             <Form.Control
               type="tel"
-              value={form.phone}
+              value={phoneFormatted}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               placeholder="+7 (999) 000-00-00"
+              isInvalid={!!phoneError}
             />
+            <Form.Control.Feedback type="invalid">{phoneError}</Form.Control.Feedback>
+            <Form.Text className="text-muted">Формат: +7 (999) 999-99-99</Form.Text>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Email</Form.Label>
             <Form.Control value={user.email} disabled readOnly />
-            <Form.Text className="text-muted">Email изменяется через администратора</Form.Text>
+            <Form.Text className="text-muted">{emailHint}</Form.Text>
           </Form.Group>
           <div className="d-flex gap-2 flex-wrap">
             <Button type="submit" className="btn-dealership-dark" disabled={saving}>
@@ -134,6 +173,14 @@ const ProfileEditor: React.FC = () => {
           <div className="dp-fieldValue">{user.email}</div>
           <div className="dp-fieldLabel">Телефон</div>
           <div className="dp-fieldValue">{user.phone?.trim() || 'Не указан'}</div>
+          <Alert variant="light" className="small text-muted py-2 mb-3">
+            {emailHint}
+            <div className="mt-2">
+              <strong>Забыли пароль или нет доступа к почте?</strong> Обратитесь к администратору салона
+              или менеджеру через раздел «Сообщения» / по телефону на странице «Контакты».
+              Самостоятельное восстановление пароля в системе пока не предусмотрено.
+            </div>
+          </Alert>
           <Button
             type="button"
             className="btn-dealership-dark w-100"

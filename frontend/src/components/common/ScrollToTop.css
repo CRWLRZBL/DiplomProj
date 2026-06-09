@@ -1,0 +1,27 @@
+.site-scroll-top {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1035;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.site-scroll-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  color: #1a1a1a;
+}
+
+body.site-modal-open .site-scroll-top {
+  pointer-events: none;
+  opacity: 0.35;
+}

@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Row, Col, Card, Button } from 'react-bootstrap';
+import React, { useMemo, useState } from 'react';
+import { Row, Col, Card, Button, Form, InputGroup } from 'react-bootstrap';
 import { Model } from '../../../services/models/car';
 import { getModelImagePath } from '../../../utils/imageUtils';
 import './Step1FamilyModel.css';
@@ -15,6 +15,17 @@ const Step1Model: React.FC<Step1ModelProps> = ({
   selectedModel,
   onModelSelect,
 }) => {
+  const [search, setSearch] = useState('');
+
+  const filteredModels = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return models;
+    return models.filter(
+      (m) =>
+        `${m.brandName} ${m.modelName} ${m.description ?? ''}`.toLowerCase().includes(q)
+    );
+  }, [models, search]);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
@@ -30,9 +41,28 @@ const Step1Model: React.FC<Step1ModelProps> = ({
         <h2 className="step-title">ВЫБЕРИТЕ МОДЕЛЬ</h2>
       </div>
 
+      <div className="mb-4" style={{ maxWidth: '420px' }}>
+        <InputGroup>
+          <InputGroup.Text>
+            <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>
+              search
+            </span>
+          </InputGroup.Text>
+          <Form.Control
+            type="search"
+            placeholder="Поиск по марке или модели…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </InputGroup>
+      </div>
+
       <div className="models-container">
+        {filteredModels.length === 0 && (
+          <p className="text-muted">По запросу «{search}» ничего не найдено.</p>
+        )}
         <Row className="g-4">
-          {models.map((model) => (
+          {filteredModels.map((model) => (
             <Col key={model.modelId} xs={12} sm={6} md={4} lg={3}>
               <Card
                 className={`model-card h-100 ${

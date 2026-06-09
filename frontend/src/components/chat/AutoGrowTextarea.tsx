@@ -10,6 +10,7 @@ type Props = {
   maxLength?: number;
   disabled?: boolean;
   className?: string;
+  onEnterSubmit?: () => void;
 };
 
 function resizeTextarea(el: HTMLTextAreaElement) {
@@ -34,6 +35,7 @@ const AutoGrowTextarea: React.FC<Props> = ({
   maxLength,
   disabled,
   className,
+  onEnterSubmit,
 }) => {
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -57,6 +59,14 @@ const AutoGrowTextarea: React.FC<Props> = ({
       className={className}
       onChange={(e) => onChange(e.target.value)}
       onInput={syncHeight}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (!disabled && value.trim() && onEnterSubmit) {
+            onEnterSubmit();
+          }
+        }
+      }}
     />
   );
 };

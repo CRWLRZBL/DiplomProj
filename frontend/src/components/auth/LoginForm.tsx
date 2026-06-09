@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert, Card } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { getApiErrorMessage } from '../../utils/apiError';
+import { validateEmail } from '../../utils/validation';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -19,11 +21,18 @@ const LoginForm: React.FC = () => {
     setLoading(true);
     setError('');
 
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setError(emailErr);
+      setLoading(false);
+      return;
+    }
+
     try {
       await login({ email, password });
       navigate(redirect || '/');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Ошибка при входе');
+    } catch (err: unknown) {
+      setError(getApiErrorMessage(err, 'Не удалось войти. Проверьте email и пароль.'));
     } finally {
       setLoading(false);
     }
@@ -68,6 +77,12 @@ const LoginForm: React.FC = () => {
               {loading ? 'Вход...' : 'Войти'}
             </Button>
           </div>
+          <p className="small text-muted mt-3 mb-0">
+            Забыли пароль или нет доступа к почте?{' '}
+            <Link to="/contacts">Свяжитесь с салоном</Link>
+            {' '}или напишите менеджеру в{' '}
+            <Link to="/messages">сообщениях</Link> после входа под другим аккаунтом.
+          </p>
         </Form>
       </Card.Body>
     </Card>

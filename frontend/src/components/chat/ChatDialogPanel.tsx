@@ -87,10 +87,15 @@ const ChatDialogPanel: React.FC<Props> = ({
                   <AutoGrowTextarea
                     value={draft}
                     onChange={onDraftChange}
-                    placeholder="Текст сообщения…"
+                    placeholder="Текст сообщения… (Enter — отправить, Shift+Enter — новая строка)"
                     maxLength={2000}
                     disabled={sending}
                     className="chat-compose-textarea"
+                    onEnterSubmit={() => {
+                      if (!sending && draft.trim()) {
+                        onSend({ preventDefault: () => {} } as React.FormEvent);
+                      }
+                    }}
                   />
                   <Button
                     type="submit"

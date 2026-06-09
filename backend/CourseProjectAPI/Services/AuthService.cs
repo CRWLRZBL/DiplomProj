@@ -198,6 +198,13 @@ namespace CourseProjectAPI.Services
             if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
                 return (null, "Укажите имя и фамилию");
 
+            if (firstName.Length < 2 || lastName.Length < 2)
+                return (null, "Имя и фамилия — минимум 2 символа");
+
+            var namePattern = new System.Text.RegularExpressions.Regex(@"^[а-яА-ЯёЁa-zA-Z][а-яА-ЯёЁa-zA-Z\s\-']{1,99}$");
+            if (!namePattern.IsMatch(firstName) || !namePattern.IsMatch(lastName))
+                return (null, "Имя и фамилия: только буквы, дефис и апостроф");
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.UserProfiles)
@@ -210,6 +217,12 @@ namespace CourseProjectAPI.Services
                 return (null, "Аккаунт заблокирован");
 
             var phone = string.IsNullOrWhiteSpace(dto.Phone) ? null : dto.Phone.Trim();
+            if (!string.IsNullOrEmpty(phone))
+            {
+                var phonePattern = new System.Text.RegularExpressions.Regex(@"^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$");
+                if (!phonePattern.IsMatch(phone))
+                    return (null, "Введите телефон в формате +7 (999) 999-99-99");
+            }
 
             if (user.UserProfiles == null)
             {

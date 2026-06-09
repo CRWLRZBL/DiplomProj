@@ -11,15 +11,7 @@ type Props = {
   source?: string;
 };
 
-const phonePattern = /^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/;
-
-function normalizePhone(input: string) {
-  const digits = input.replace(/\D/g, '');
-  const local = digits.startsWith('7') ? digits.slice(1) : digits.startsWith('8') ? digits.slice(1) : digits;
-  const d = local.slice(0, 10);
-  if (d.length < 10) return input;
-  return `+7 (${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6, 8)}-${d.slice(8, 10)}`;
-}
+import { normalizePhone, PHONE_PATTERN } from '../../utils/validation';
 
 const ConsultationModal: React.FC<Props> = ({
   show,
@@ -35,7 +27,7 @@ const ConsultationModal: React.FC<Props> = ({
   const [status, setStatus] = useState<'idle' | 'success'>('idle');
 
   const phoneFormatted = useMemo(() => normalizePhone(phone), [phone]);
-  const phoneValid = phonePattern.test(phoneFormatted);
+  const phoneValid = PHONE_PATTERN.test(phoneFormatted);
 
   const canSubmit = agreed && phoneValid;
 

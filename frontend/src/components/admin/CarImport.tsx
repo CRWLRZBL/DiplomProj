@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Card, Form, Button, Alert, ListGroup } from 'react-bootstrap';
 import { importService, ImportResult } from '../../services/api/importService';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 const CarImport: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -22,8 +23,8 @@ const CarImport: React.FC = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Ошибка при скачивании шаблона');
+    } catch (err: unknown) {
+      setError(getApiErrorMessage(err, 'Не удалось скачать шаблон.'));
       console.error('Template download error:', err);
     }
   };
@@ -65,23 +66,9 @@ const CarImport: React.FC = () => {
           fileInputRef.current.value = '';
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Import error:', err);
-      let errorMessage = 'Ошибка при импорте файла';
-      
-      if (err.response?.data) {
-        if (err.response.data.error) {
-          errorMessage = err.response.data.error;
-        } else if (err.response.data.errors && Array.isArray(err.response.data.errors)) {
-          errorMessage = `Ошибки валидации:\n${err.response.data.errors.join('\n')}`;
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      
-      setError(errorMessage);
+      setError(getApiErrorMessage(err, 'Не удалось импортировать файл.'));
     } finally {
       setLoading(false);
     }
@@ -156,13 +143,14 @@ const CarImport: React.FC = () => {
           <div className="mb-3">
             <small className="text-muted">
               <strong>Формат файла Excel:</strong><br />
-              <strong>Колонка 1 - Модель</strong> (обязательно): Полное название модели автомобиля, например: "Granta Седан", "Vesta Седан", "Niva Travel". Название должно точно совпадать с названием модели в базе данных.<br />
-              <strong>Колонка 2 - Цвет</strong> (опционально): Цвет автомобиля, например: "Ледниковый", "Пантера", "Платина", "Борнео", "Капитан", "Кориандр", "Фламенко". По умолчанию: "Ледниковый".<br />
-              <strong>Колонка 3 - VIN</strong> (опционально): VIN номер автомобиля. Если не указан, будет автоматически сгенерирован уникальный VIN. VIN должен быть уникальным - если VIN уже существует в базе, строка будет пропущена с ошибкой.<br />
-              <strong>Колонка 4 - Статус</strong> (опционально): Статус автомобиля: "В наличии" (или "Available"), "Забронирован" (или "Reserved"), "Продан" (или "Sold"). По умолчанию: "В наличии".<br />
-              <strong>Колонка 5 - Пробег</strong> (опционально): Пробег автомобиля в километрах (число). По умолчанию: 0.<br />
+              <strong>Колонка 1 — Марка</strong> (обязательно): например, «LADA». Должна совпадать со справочником.<br />
+              <strong>Колонка 2 — Модель</strong> (обязательно): полное название, например «Granta Седан», «Vesta Седан».<br />
+              <strong>Колонка 3 — Цвет</strong> (опционально): «Ледниковый», «Пантера», «Платина» и др. По умолчанию: «Ледниковый».<br />
+              <strong>Колонка 4 — VIN</strong> (обязательно): 17 символов, уникальный для каждого авто.<br />
+              <strong>Колонка 5 — Статус</strong> (опционально): «В наличии», «Забронирован», «Продан». По умолчанию: «В наличии».<br />
+              <strong>Колонка 6 — Пробег</strong> (опционально): километры, целое число ≥ 0. По умолчанию: 0.<br />
               <br />
-              <strong>Важно:</strong> Первая строка файла должна содержать заголовки. Данные начинаются со второй строки. Если модель не найдена в базе данных, строка будет пропущена с ошибкой.
+              <strong>Важно:</strong> первая строка — заголовки, данные со второй. Пустые строки пропускаются. При ошибке в строке она не импортируется, остальные обрабатываются.
             </small>
           </div>
 
@@ -170,9 +158,9 @@ const CarImport: React.FC = () => {
             variant="primary"
             onClick={handleImport}
             disabled={loading || !file}
-            className="w-100"
+            className="w-100 btn-dealership-dark"
           >
-            {loading ? 'Импорт...' : '📤 Импортировать автомобили'}
+            {loading ? 'Импорт…' : 'Импортировать автомобили'}
           </Button>
         </Form>
       </Card.Body>

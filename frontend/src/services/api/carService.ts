@@ -146,6 +146,17 @@ export const carService = {
     await apiClient.delete(`/cars/catalog/${carId}`);
   },
 
+  async createInventoryCar(data: {
+    modelId: number;
+    color: string;
+    vin: string;
+    status?: string;
+    mileage?: number;
+  }): Promise<Car> {
+    const response = await apiClient.post<Car>('/cars/inventory', data);
+    return response.data;
+  },
+
   async uploadCatalogImage(file: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);

@@ -416,6 +416,52 @@ namespace CourseProjectAPI.Services
             return cars.Select(CarMapping.ToDto).ToList();
         }
 
+        public async Task<(CarDto? car, string? error)> CreateInventoryCarAsync(CreateInventoryCarDto dto)
+        {
+            var model = await _context.Models
+                .Include(m => m.Brand)
+                .FirstOrDefaultAsync(m => m.ModelId == dto.ModelId);
+
+            if (model == null)
+                return (null, "Модель не найдена в справочнике");
+
+            var color = dto.Color?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(color))
+                return (null, "Укажите цвет автомобиля");
+
+            var colorExists = await _context.Colors.AnyAsync(c => c.ColorName == color);
+            if (!colorExists)
+                return (null, $"Цвет «{color}» не найден в справочнике");
+
+            var vin = dto.Vin?.Trim().ToUpperInvariant() ?? string.Empty;
+            if (vin.Length != 17)
+                return (null, "VIN должен содержать ровно 17 символов");
+
+            if (await _context.Cars.AnyAsync(c => c.Vin == vin))
+                return (null, $"Автомобиль с VIN {vin} уже существует");
+
+            var status = string.IsNullOrWhiteSpace(dto.Status) ? "Available" : dto.Status.Trim();
+            if (status is not ("Available" or "Reserved" or "Sold"))
+                return (null, "Недопустимый статус. Доступны: В наличии, Забронирован, Продан");
+
+            if (dto.Mileage < 0)
+                return (null, "Пробег не может быть отрицательным");
+
+            var car = new Car
+            {
+                ModelId = model.ModelId,
+                Color = color,
+                Vin = vin,
+                Status = status,
+                Mileage = dto.Mileage,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            _context.Cars.Add(car);
+            await _context.SaveChangesAsync();
+            return (await GetCarByIdAsync(car.CarId), null);
+        }
+
         public async Task<CarDto> CreateCarListingAsync(SaveCarListingDto dto)
         {
             var car = new Car

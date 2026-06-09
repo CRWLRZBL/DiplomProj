@@ -15,10 +15,12 @@ import TestDrive from './pages/TestDrive';
 import About from './pages/About';
 import Contacts from './pages/Contacts';
 import ConsultationHost from './components/common/ConsultationHost';
+import ScrollToTop from './components/common/ScrollToTop';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './DealershipTheme.css';
 import './App.css';
 import './components/common/ConsultationModal.css';
+import './components/common/ScrollToTop.css';
 
 function App() {
    return (
@@ -46,6 +48,7 @@ function App() {
           </main>
           <Footer />
           <ConsultationHost />
+          <ScrollToTop />
         </div>
       </Router>
     </AuthProvider>

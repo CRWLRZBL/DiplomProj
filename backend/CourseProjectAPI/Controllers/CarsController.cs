@@ -356,6 +356,22 @@ namespace CourseProjectAPI.Controllers
         /// 400 BadRequest - файл не загружен или имеет недопустимый формат (не Excel).
         /// 500 InternalServerError - внутренняя ошибка сервера при обработке файла.
         /// </returns>
+        [HttpPost("inventory")]
+        public async Task<ActionResult<CarDto>> CreateInventoryCar([FromBody] CreateInventoryCarDto dto)
+        {
+            try
+            {
+                var (car, error) = await _carService.CreateInventoryCarAsync(dto);
+                if (!string.IsNullOrEmpty(error))
+                    return BadRequest(new { Error = error });
+                return Ok(car);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = "Не удалось добавить автомобиль. Попробуйте позже." });
+            }
+        }
+
         [HttpPost("import/excel")]
         public async Task<IActionResult> ImportCarsFromExcel(IFormFile file, [FromServices] IExcelImportService excelImportService)
         {

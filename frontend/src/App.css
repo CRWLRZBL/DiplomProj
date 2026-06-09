@@ -727,6 +727,33 @@ html, body {
   object-position: center;
 }
 
+.catalog-listing-card {
+  border: 2px solid transparent !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.catalog-listing-card:hover {
+  transform: translateY(-4px);
+  border-color: #e96b5d !important;
+  box-shadow: 0 10px 28px rgba(233, 107, 93, 0.22) !important;
+}
+
+.catalog-manage-card {
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.catalog-manage-card:hover,
+.catalog-manage-card.selected {
+  border-color: #e96b5d;
+  box-shadow: 0 8px 24px rgba(233, 107, 93, 0.25);
+}
+
+.catalog-manage-card.selected {
+  transform: translateY(-2px);
+}
+
 .catalog-detail-main-image {
   background: #f8f9fa;
   display: flex;

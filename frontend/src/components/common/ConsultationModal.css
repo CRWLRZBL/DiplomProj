@@ -22,7 +22,8 @@ body.site-modal-open {
 }
 
 body.site-modal-open .hp-fab,
-body.site-modal-open .site-header-call {
+body.site-modal-open .site-header-call,
+body.site-modal-open .site-scroll-top {
   pointer-events: none !important;
   opacity: 0.35;
 }

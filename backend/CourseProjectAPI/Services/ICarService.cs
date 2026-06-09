@@ -11,6 +11,7 @@ namespace CourseProjectAPI.Services
         Task<CarDto> GetCarByIdAsync(int id);
         Task<CarDto> UpdateCarAsync(int id, UpdateCarDto updateDto);
         Task<List<CarDto>> GetCatalogListingsAsync(string? listingType = null, string? brand = null, string? bodyType = null, string? search = null, bool publishedOnly = true);
+        Task<(CarDto? car, string? error)> CreateInventoryCarAsync(CreateInventoryCarDto dto);
         Task<CarDto> CreateCarListingAsync(SaveCarListingDto dto);
         Task<CarDto> UpdateCarListingAsync(int id, SaveCarListingDto dto);
         Task<bool> DeleteCarListingAsync(int id);

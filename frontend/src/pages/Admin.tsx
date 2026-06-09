@@ -12,6 +12,10 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorAlert from '../components/common/ErrorAlert';
 import SalesReportExport from '../components/admin/SalesReportExport';
 import CarImport from '../components/admin/CarImport';
+import AddSingleCar from '../components/admin/AddSingleCar';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { getApiErrorMessage } from '../utils/apiError';
+import { validateVin, parseNonNegativeInt } from '../utils/validation';
 import Pagination from '../components/common/Pagination';
 import {
   resolvePublicImageUrl,
@@ -49,7 +53,9 @@ const Admin: React.FC = () => {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [deletingCarId, setDeletingCarId] = useState<number | null>(null);
   const [success, setSuccess] = useState('');
-  
+  const [showAddCar, setShowAddCar] = useState(false);
+  const [colorOptions, setColorOptions] = useState<string[]>([]);
+
   // Состояния для поиска и фильтрации заказов
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>('all');
@@ -66,9 +72,14 @@ const Admin: React.FC = () => {
   const [carPage, setCarPage] = useState(1);
   const carItemsPerPage = 10;
 
+  useBodyScrollLock(showEditModal);
+
   useEffect(() => {
     if (user?.roleName === 'Admin') {
       loadData();
+      void carService.getColors().then((colors) => {
+        if (colors.length > 0) setColorOptions(colors.map((c) => c.name));
+      });
     }
   }, [user]);
 
@@ -197,14 +208,29 @@ const Admin: React.FC = () => {
 
   const handleSaveCar = async () => {
     if (!editingCar) return;
-    
+
+    const vinError = validateVin(editForm.vin);
+    if (vinError) {
+      setError(vinError);
+      return;
+    }
+    if (!editForm.color.trim()) {
+      setError('Укажите цвет автомобиля');
+      return;
+    }
+    const mileage = parseNonNegativeInt(String(editForm.mileage));
+    if (mileage == null) {
+      setError('Пробег должен быть неотрицательным числом');
+      return;
+    }
+
     try {
       setError('');
       await carService.updateCar(editingCar.carId, {
         color: editForm.color,
         status: editForm.status,
         vin: editForm.vin,
-        mileage: editForm.mileage || undefined,
+        mileage: mileage || undefined,
         imageUrl: photoGallery[0] ?? (editForm.imageUrl.trim() ? editForm.imageUrl.trim() : null),
         imageUrls: photoGallery,
         condition: editForm.condition,
@@ -214,7 +240,7 @@ const Admin: React.FC = () => {
       setPhotoGallery([]);
       await loadData();
     } catch (err) {
-      setError('Ошибка при обновлении автомобиля');
+      setError(getApiErrorMessage(err, 'Не удалось обновить автомобиль.'));
       console.error('Error updating car:', err);
     }
   };
@@ -693,6 +719,11 @@ const Admin: React.FC = () => {
               <>
                 <Row>
                   <Col md={12} className="mb-4">
+                    <div className="d-flex flex-wrap gap-2 mb-3">
+                      <Button className="btn-dealership-dark" onClick={() => setShowAddCar(true)}>
+                        Добавить
+                      </Button>
+                    </div>
                     <CarImport />
                   </Col>
                 </Row>
@@ -888,7 +919,26 @@ const Admin: React.FC = () => {
         </Row>
 
         {/* Модальное окно редактирования автомобиля */}
-        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <AddSingleCar
+          show={showAddCar}
+          onHide={() => setShowAddCar(false)}
+          onCreated={() => {
+            setSuccess('Автомобиль добавлен в склад.');
+            void loadData();
+          }}
+        />
+
+        <Modal
+          show={showEditModal}
+          onHide={() => setShowEditModal(false)}
+          centered
+          scrollable
+          backdrop={false}
+          enforceFocus={false}
+          className="consultation-modal"
+          dialogClassName="consultation-modal-dialog modal-dialog-centered"
+          container={typeof document !== 'undefined' ? document.body : undefined}
+        >
           <Modal.Header closeButton>
             <Modal.Title>Редактирование автомобиля #{editingCar?.carId}</Modal.Title>
           </Modal.Header>
@@ -904,13 +954,29 @@ const Admin: React.FC = () => {
               </Form.Group>
               
               <Form.Group className="mb-3">
-                <Form.Label>Цвет</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editForm.color}
-                  onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
-                  placeholder="Введите цвет"
-                />
+                <Form.Label>Цвет *</Form.Label>
+                {colorOptions.length > 0 ? (
+                  <Form.Select
+                    value={editForm.color}
+                    onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                    required
+                  >
+                    <option value="">Выберите цвет</option>
+                    {colorOptions.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </Form.Select>
+                ) : (
+                  <Form.Control
+                    type="text"
+                    value={editForm.color}
+                    onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                    placeholder="Введите цвет"
+                    required
+                  />
+                )}
               </Form.Group>
 
               <Form.Group className="mb-3">
@@ -926,14 +992,14 @@ const Admin: React.FC = () => {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>VIN {editForm.listingType === 'Used' ? '*' : ''}</Form.Label>
+                <Form.Label>VIN *</Form.Label>
                 <Form.Control
                   type="text"
                   value={editForm.vin}
                   onChange={(e) => setEditForm({ ...editForm, vin: e.target.value.toUpperCase() })}
                   placeholder="17 символов"
                   maxLength={17}
-                  required={editForm.listingType === 'Used'}
+                  required
                 />
               </Form.Group>
 
@@ -956,10 +1022,14 @@ const Admin: React.FC = () => {
               <Form.Group className="mb-3">
                 <Form.Label>Пробег</Form.Label>
                 <Form.Control
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={editForm.mileage}
-                  onChange={(e) => setEditForm({ ...editForm, mileage: parseInt(e.target.value) || 0 })}
-                  placeholder="Введите пробег"
+                  onChange={(e) => {
+                    const n = parseNonNegativeInt(e.target.value);
+                    setEditForm({ ...editForm, mileage: n ?? 0 });
+                  }}
+                  placeholder="0"
                 />
               </Form.Group>
 
