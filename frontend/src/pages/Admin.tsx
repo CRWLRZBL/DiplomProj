@@ -74,14 +74,26 @@ const Admin: React.FC = () => {
 
   useBodyScrollLock(showEditModal);
 
+  const isAdmin = user?.roleName === 'Admin';
+  const isManager = user?.roleName === 'Manager';
+  const isStaff = isAdmin || isManager;
+
   useEffect(() => {
-    if (user?.roleName === 'Admin') {
+    if (isStaff) {
       loadData();
+    }
+    if (isAdmin) {
       void carService.getColors().then((colors) => {
         if (colors.length > 0) setColorOptions(colors.map((c) => c.name));
       });
     }
-  }, [user]);
+  }, [user, isStaff, isAdmin]);
+
+  useEffect(() => {
+    if (isManager && activeTab !== 'orders') {
+      setActiveTab('orders');
+    }
+  }, [isManager, activeTab]);
 
   const loadData = async () => {
     try {
@@ -411,7 +423,7 @@ const Admin: React.FC = () => {
   };
 
   // Условные return после всех хуков
-  if (!user || user.roleName !== 'Admin') {
+  if (!user || !isStaff) {
     return <Navigate to="/" replace />;
   }
 
@@ -430,8 +442,14 @@ const Admin: React.FC = () => {
           <Row className="mb-4">
             <Col>
               <div>
-                <h1 className="display-5 fw-bold mb-2 text-dark">Админ-панель</h1>
-                <p className="text-dark mb-0" style={{ fontSize: '1.125rem' }}>Управление заказами, автомобилями и отчеты</p>
+                <h1 className="display-5 fw-bold mb-2 text-dark">
+                  {isManager ? 'Управление заказами' : 'Админ-панель'}
+                </h1>
+                <p className="text-dark mb-0" style={{ fontSize: '1.125rem' }}>
+                  {isManager
+                    ? 'Просмотр заказов, деталей и смена статуса'
+                    : 'Управление заказами, автомобилями и отчёты'}
+                </p>
               </div>
             </Col>
           </Row>
@@ -466,26 +484,30 @@ const Admin: React.FC = () => {
                     <i className="bi bi-speedometer2 me-2"></i>
                     Панель управления
                   </Nav.Link>
-                  <Nav.Link 
-                    active={activeTab === 'cars'} 
-                    onClick={() => setActiveTab('cars')}
-                    className="admin-side-nav__link px-4 py-3"
-                  >
-                    <i className="bi bi-car-front me-2"></i>
-                    Управление автомобилями
-                  </Nav.Link>
-                  <Nav.Link 
-                    active={activeTab === 'reports'} 
-                    onClick={() => setActiveTab('reports')}
-                    className="admin-side-nav__link px-4 py-3"
-                  >
-                    <i className="bi bi-graph-up me-2"></i>
-                    Отчеты по продажам
-                  </Nav.Link>
-                  <Nav.Link as={Link} to="/catalog/manage" className="px-4 py-3">
-                    <i className="bi bi-grid me-2"></i>
-                    Каталог (редактирование)
-                  </Nav.Link>
+                  {isAdmin && (
+                    <>
+                      <Nav.Link
+                        active={activeTab === 'cars'}
+                        onClick={() => setActiveTab('cars')}
+                        className="admin-side-nav__link px-4 py-3"
+                      >
+                        <i className="bi bi-car-front me-2"></i>
+                        Управление автомобилями
+                      </Nav.Link>
+                      <Nav.Link
+                        active={activeTab === 'reports'}
+                        onClick={() => setActiveTab('reports')}
+                        className="admin-side-nav__link px-4 py-3"
+                      >
+                        <i className="bi bi-graph-up me-2"></i>
+                        Отчеты по продажам
+                      </Nav.Link>
+                      <Nav.Link as={Link} to="/catalog/manage" className="px-4 py-3">
+                        <i className="bi bi-grid me-2"></i>
+                        Каталог (редактирование)
+                      </Nav.Link>
+                    </>
+                  )}
                 </Nav>
               </Card.Body>
             </Card>
@@ -719,24 +741,28 @@ const Admin: React.FC = () => {
               <>
                 <Row>
                   <Col md={12} className="mb-4">
-                    <div className="d-flex flex-wrap gap-2 mb-3">
-                      <Button className="btn-dealership-dark" onClick={() => setShowAddCar(true)}>
-                        Добавить
-                      </Button>
-                    </div>
                     <CarImport />
                   </Col>
                 </Row>
                 <Card className="shadow-sm border-0">
                   <Card.Header className="bg-light">
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                       <h4 className="mb-0">
                         <i className="bi bi-car-front me-2"></i>
                         Управление автомобилями
                       </h4>
-                      <Button variant="outline-primary" size="sm" onClick={loadData}>
-                        Обновить
-                      </Button>
+                      <div className="d-flex gap-2">
+                        <Button
+                          className="btn-dealership-dark"
+                          size="sm"
+                          onClick={() => setShowAddCar(true)}
+                        >
+                          Добавить
+                        </Button>
+                        <Button variant="outline-primary" size="sm" onClick={loadData}>
+                          Обновить
+                        </Button>
+                      </div>
                     </div>
                   </Card.Header>
                   <Card.Body>

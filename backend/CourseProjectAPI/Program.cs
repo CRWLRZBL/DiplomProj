@@ -1,5 +1,6 @@
 using CourseProjectAPI.Data;
 using CourseProjectAPI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,31 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
         options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping; // Поддержка кириллицы
     });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var messages = context.ModelState
+            .Where(kv => kv.Value?.Errors.Count > 0)
+            .SelectMany(kv => kv.Value!.Errors.Select(err =>
+                string.IsNullOrWhiteSpace(err.ErrorMessage)
+                    ? $"Проверьте поле «{kv.Key}»"
+                    : err.ErrorMessage))
+            .Distinct()
+            .ToList();
+
+        return new BadRequestObjectResult(new
+        {
+            Error = messages.Count > 0
+                ? string.Join(" ", messages)
+                : "Проверьте правильность заполнения полей.",
+            Errors = messages
+        });
+    };
+});
+
+builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 12 * 1024 * 1024);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

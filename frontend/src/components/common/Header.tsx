@@ -33,7 +33,7 @@ const Header: React.FC = () => {
     setStaffView(next);
     localStorage.setItem(STAFF_VIEW_KEY, next ? 'staff' : 'client');
     if (next) {
-      navigate(isAdmin ? '/admin' : '/catalog/manage');
+      navigate('/admin');
     } else {
       navigate('/catalog');
     }
@@ -88,28 +88,22 @@ const Header: React.FC = () => {
             <Nav className="me-auto my-2 my-lg-0 mx-lg-auto">
               {isStaff && staffView ? (
                 <>
-                  <Nav.Link as={Link} to="/catalog/manage">
-                    Управление каталогом
+                  <Nav.Link as={Link} to="/admin">
+                    Заказы
                   </Nav.Link>
                   <Nav.Link as={Link} to="/messages">
                     Сообщения
                   </Nav.Link>
                   {isAdmin && (
-                    <Nav.Link as={Link} to="/admin">
-                      Админ-панель
-                    </Nav.Link>
+                    <>
+                      <Nav.Link as={Link} to="/admin">
+                        Админ-панель
+                      </Nav.Link>
+                      <Nav.Link as={Link} to="/catalog/manage">
+                        Управление каталогом
+                      </Nav.Link>
+                    </>
                   )}
-                  <NavDropdown title="Вид клиента" id="nav-client-view">
-                    <NavDropdown.Item onClick={() => toggleStaffView('client')}>
-                      Каталог для клиентов
-                    </NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/configurator">
-                      Конфигуратор
-                    </NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/">
-                      Главная страница
-                    </NavDropdown.Item>
-                  </NavDropdown>
                 </>
               ) : (
                 <>
@@ -132,22 +126,6 @@ const Header: React.FC = () => {
                   <Nav.Link as={Link} to={user ? '/messages' : '/profile?redirect=/messages'}>
                     Сообщения
                   </Nav.Link>
-
-                  {isStaff && (
-                    <NavDropdown title="Персонал" id="nav-staff">
-                      <NavDropdown.Item onClick={() => toggleStaffView('staff')}>
-                        Режим персонала
-                      </NavDropdown.Item>
-                      <NavDropdown.Item as={Link} to="/catalog/manage">
-                        Управление каталогом
-                      </NavDropdown.Item>
-                      {isAdmin && (
-                        <NavDropdown.Item as={Link} to="/admin">
-                          Админ-панель
-                        </NavDropdown.Item>
-                      )}
-                    </NavDropdown>
-                  )}
 
                   <Nav.Link as={Link} to="/about">
                     О компании
@@ -192,6 +170,10 @@ const Header: React.FC = () => {
                       <NavDropdown.Item as={Link} to="/admin">
                         <Icon name="admin_panel_settings" className="me-2" style={{ verticalAlign: 'middle' }} />
                         Админ‑панель
+                      </NavDropdown.Item>
+                      <NavDropdown.Item as={Link} to="/catalog/manage">
+                        <Icon name="grid_view" className="me-2" style={{ verticalAlign: 'middle' }} />
+                        Управление каталогом
                       </NavDropdown.Item>
                     </>
                   )}

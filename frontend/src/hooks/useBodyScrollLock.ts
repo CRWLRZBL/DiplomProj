@@ -11,7 +11,6 @@ export function useBodyScrollLock(locked: boolean, onOverlayClick?: () => void) 
     if (!locked || typeof document === 'undefined') return;
 
     const scrollY = window.scrollY;
-    window.scrollTo(0, 0);
     const { overflow, position, top, left, right, width } = document.body.style;
 
     const overlay = document.createElement('div');
@@ -23,7 +22,7 @@ export function useBodyScrollLock(locked: boolean, onOverlayClick?: () => void) 
 
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
-    document.body.style.top = '0';
+    document.body.style.top = `-${scrollY}px`;
     document.body.style.left = '0';
     document.body.style.right = '0';
     document.body.style.width = '100%';

@@ -29,8 +29,7 @@ const Catalog: React.FC = () => {
   });
   const [photoMatchIds, setPhotoMatchIds] = useState<number[] | null>(null);
 
-  const isStaff =
-    user?.roleName === USER_ROLES.ADMIN || user?.roleName === USER_ROLES.MANAGER;
+  const isAdmin = user?.roleName === USER_ROLES.ADMIN;
 
   useEffect(() => {
     loadCars();
@@ -107,7 +106,7 @@ const Catalog: React.FC = () => {
             <h1 className="display-6 fw-bold mb-2">Каталог автомобилей</h1>
             <p className="text-muted mb-0">Мультибрендовый салон «Авторитет» — новые и автомобили с пробегом</p>
           </Col>
-          {isStaff && (
+          {isAdmin && (
             <Col xs="auto">
               <Button as={Link as any} to="/catalog/manage" className="btn-dealership-dark">
                 Управление каталогом

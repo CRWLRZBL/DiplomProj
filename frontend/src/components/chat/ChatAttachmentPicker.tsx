@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form, Spinner } from 'react-bootstrap';
 import { carService } from '../../services/api/carService';
 import { resolvePublicImageUrl } from '../../utils/catalogImage';
+import { getApiErrorMessage } from '../../utils/apiError';
+
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 type Props = {
   onAttach: (line: string) => void;
@@ -40,14 +43,22 @@ const ChatAttachmentPicker: React.FC<Props> = ({
   const handleFile = async (file: File) => {
     setError('');
     setPreviewUrl('');
+
+    if (file.size > MAX_FILE_BYTES) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      setError(`Файл слишком большой (${mb} МБ). Максимум — 10 МБ.`);
+      if (inputRef.current) inputRef.current.value = '';
+      return;
+    }
+
     setUploading(true);
     try {
       const url = await carService.uploadCatalogImage(file);
       const publicUrl = resolvePublicImageUrl(url);
       setPreviewUrl(publicUrl);
       onAttach(`📎 ${file.name}: ${publicUrl}`);
-    } catch {
-      setError('Не удалось загрузить файл. Допустимы JPG, PNG, WEBP или GIF до 10 МБ.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Не удалось загрузить файл. Допустимы JPG, PNG, WEBP или GIF до 10 МБ.'));
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';

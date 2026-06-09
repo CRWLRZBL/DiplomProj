@@ -8,7 +8,11 @@ import { Car, SaveCarListing } from '../services/models/car';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Pagination from '../components/common/Pagination';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
-import { resolvePublicImageUrl, handleCatalogImageError } from '../utils/catalogImage';
+import {
+  resolvePublicImageUrl,
+  resolveCatalogImageSrc,
+  handleCatalogImageError,
+} from '../utils/catalogImage';
 import {
   CAR_CONDITION_OPTIONS,
   DEFAULT_CONDITION_NEW,
@@ -19,17 +23,18 @@ import {
   DRIVE_OPTIONS,
   FUEL_TYPE_OPTIONS,
   TRANSMISSION_OPTIONS,
-  DEFAULT_CATALOG_COLORS,
 } from '../constants/vehicleForm';
 import {
-  validateVin,
-  validateYear,
-  validatePositiveNumber,
-  validateEngineVolume,
+  validateCatalogForm,
+  sanitizeVinInput,
+  sanitizeDigits,
+  sanitizeDecimalInput,
+  parseDecimalInput,
   parseNonNegativeInt,
-  parsePositiveDecimal,
+  FIELD_LIMITS,
   MAX_CAR_YEAR,
   MIN_CAR_YEAR,
+  type FieldErrors,
 } from '../utils/validation';
 import { getApiErrorMessage } from '../utils/apiError';
 
@@ -107,7 +112,8 @@ const CatalogManage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [colorOptions, setColorOptions] = useState<string[]>([...DEFAULT_CATALOG_COLORS]);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [engineCapacityText, setEngineCapacityText] = useState('');
   const itemsPerPage = PAGINATION.DEFAULT_PAGE_SIZE;
 
   const applyPhotoGallery = (urls: string[]) => {
@@ -128,22 +134,13 @@ const CatalogManage: React.FC = () => {
     applyPhotoGallery(next);
   };
 
-  const isStaff =
-    user?.roleName === USER_ROLES.ADMIN || user?.roleName === USER_ROLES.MANAGER;
+  const isAdmin = user?.roleName === USER_ROLES.ADMIN;
 
   useBodyScrollLock(showForm);
 
   useEffect(() => {
-    if (isStaff) loadAll();
-  }, [isStaff]);
-
-  useEffect(() => {
-    void carService.getColors().then((colors) => {
-      if (colors.length > 0) {
-        setColorOptions(colors.map((c) => c.name));
-      }
-    });
-  }, []);
+    if (isAdmin) loadAll();
+  }, [isAdmin]);
 
   const loadAll = async () => {
     try {
@@ -173,7 +170,7 @@ const CatalogManage: React.FC = () => {
     return filteredCars.slice(start, start + itemsPerPage);
   }, [filteredCars, page, itemsPerPage]);
 
-  if (!user || !isStaff) {
+  if (!user || !isAdmin) {
     return <Navigate to="/catalog" replace />;
   }
 
@@ -181,6 +178,8 @@ const CatalogManage: React.FC = () => {
     setEditId(null);
     setForm(emptyForm());
     setPhotoGallery([]);
+    setEngineCapacityText('');
+    setFieldErrors({});
     setShowForm(true);
     setError('');
     setSuccess('');
@@ -225,39 +224,25 @@ const CatalogManage: React.FC = () => {
           ? [car.imageUrl]
           : [];
     applyPhotoGallery(gallery);
+    setEngineCapacityText(
+      car.engineCapacity != null ? String(car.engineCapacity).replace(',', '.') : ''
+    );
+    setFieldErrors({});
     setShowForm(true);
     setError('');
     setSuccess('');
   };
 
-  const validateForm = (): string | null => {
-    if (!form.brandName.trim()) return 'Укажите марку автомобиля';
-    if (!form.modelName.trim()) return 'Укажите модель автомобиля';
-    const vinErr = validateVin(form.vin ?? '');
-    if (vinErr) return vinErr;
-    const priceErr = validatePositiveNumber(form.basePrice, 'Цена');
-    if (priceErr) return priceErr;
-    const yearErr = validateYear(form.modelYear);
-    if (yearErr) return yearErr;
-    if (form.listingType === 'Used') {
-      const mileageErr = validatePositiveNumber(form.mileage, 'Пробег');
-      if (mileageErr) return mileageErr;
-    }
-    const volumeErr = validateEngineVolume(form.engineCapacity);
-    if (volumeErr) return volumeErr;
-    if (!form.color?.trim()) return 'Выберите цвет';
-    if (!form.bodyType) return 'Выберите тип кузова';
-    if (!form.fuelType) return 'Выберите тип топлива';
-    if (!form.transmission) return 'Выберите коробку передач';
-    if (!form.driveType) return 'Выберите привод';
-    return null;
-  };
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
+
+    const engineCapacity = parseDecimalInput(engineCapacityText);
+    const formWithVolume = { ...form, engineCapacity };
+    const errors = validateCatalogForm(formWithVolume);
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      setError('Исправьте ошибки в полях формы.');
       return;
     }
     setSaving(true);
@@ -265,7 +250,7 @@ const CatalogManage: React.FC = () => {
     setSuccess('');
     try {
       const payload: SaveCarListing = {
-        ...form,
+        ...formWithVolume,
         imageUrl: photoGallery[0] ?? '',
         imageUrls: photoGallery,
         showPriceFrom: form.listingType === 'New',
@@ -358,7 +343,7 @@ const CatalogManage: React.FC = () => {
                   style={{ height: 160 }}
                 >
                   <img
-                    src={resolvePublicImageUrl(c.imageUrl || c.imageUrls?.[0] || '')}
+                    src={resolveCatalogImageSrc(c)}
                     alt=""
                     onError={handleCatalogImageError}
                   />
@@ -474,22 +459,26 @@ const CatalogManage: React.FC = () => {
                 <Form.Group>
                   <Form.Label>Марка *</Form.Label>
                   <Form.Control
-                    required
                     value={form.brandName}
+                    maxLength={FIELD_LIMITS.brand}
+                    isInvalid={!!fieldErrors.brandName}
                     onChange={(e) => setForm({ ...form, brandName: e.target.value })}
                     placeholder="LADA, Kia, Hyundai..."
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.brandName}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Модель *</Form.Label>
                   <Form.Control
-                    required
                     value={form.modelName}
+                    maxLength={FIELD_LIMITS.model}
+                    isInvalid={!!fieldErrors.modelName}
                     onChange={(e) => setForm({ ...form, modelName: e.target.value })}
                     placeholder="Vesta, Rio..."
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.modelName}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={12}>
@@ -505,18 +494,14 @@ const CatalogManage: React.FC = () => {
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Цвет *</Form.Label>
-                  <Form.Select
-                    required
+                  <Form.Control
                     value={form.color}
+                    maxLength={FIELD_LIMITS.color}
+                    isInvalid={!!fieldErrors.color}
                     onChange={(e) => setForm({ ...form, color: e.target.value })}
-                  >
-                    <option value="">Выберите цвет</option>
-                    {colorOptions.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </Form.Select>
+                    placeholder="Ледниковый, Пантера..."
+                  />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.color}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
@@ -525,14 +510,15 @@ const CatalogManage: React.FC = () => {
                   <Form.Control
                     type="text"
                     inputMode="numeric"
-                    required
+                    isInvalid={!!fieldErrors.basePrice}
                     value={form.basePrice ? String(form.basePrice) : ''}
                     onChange={(e) => {
-                      const n = parseNonNegativeInt(e.target.value);
-                      setForm({ ...form, basePrice: n ?? 0 });
+                      const raw = sanitizeDigits(e.target.value, FIELD_LIMITS.priceDigits);
+                      setForm({ ...form, basePrice: raw ? Number(raw) : 0 });
                     }}
                     placeholder="Например, 1000000"
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.basePrice}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               {form.listingType === 'New' && (
@@ -548,27 +534,33 @@ const CatalogManage: React.FC = () => {
                   <Form.Control
                     type="text"
                     inputMode="numeric"
+                    isInvalid={!!fieldErrors.mileage}
                     value={form.mileage != null ? String(form.mileage) : ''}
                     onChange={(e) => {
-                      const n = parseNonNegativeInt(e.target.value);
-                      setForm({ ...form, mileage: n ?? 0 });
+                      const raw = sanitizeDigits(e.target.value, FIELD_LIMITS.mileageDigits);
+                      setForm({ ...form, mileage: raw ? Number(raw) : 0 });
                     }}
                     disabled={form.listingType === 'New'}
                     placeholder="0"
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.mileage}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Год *</Form.Label>
                   <Form.Control
-                    type="number"
-                    min={MIN_CAR_YEAR}
-                    max={MAX_CAR_YEAR}
-                    value={form.modelYear ?? ''}
-                    onChange={(e) => setForm({ ...form, modelYear: Number(e.target.value) })}
-                    required
+                    type="text"
+                    inputMode="numeric"
+                    isInvalid={!!fieldErrors.modelYear}
+                    value={form.modelYear != null ? String(form.modelYear) : ''}
+                    onChange={(e) => {
+                      const raw = sanitizeDigits(e.target.value, 4);
+                      setForm({ ...form, modelYear: raw ? Number(raw) : undefined });
+                    }}
+                    placeholder={`${MIN_CAR_YEAR}–${MAX_CAR_YEAR}`}
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.modelYear}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={6}>
@@ -576,11 +568,12 @@ const CatalogManage: React.FC = () => {
                   <Form.Label>VIN *</Form.Label>
                   <Form.Control
                     value={form.vin ?? ''}
-                    onChange={(e) => setForm({ ...form, vin: e.target.value.toUpperCase() })}
+                    isInvalid={!!fieldErrors.vin}
+                    onChange={(e) => setForm({ ...form, vin: sanitizeVinInput(e.target.value) })}
                     placeholder="17 символов, например XTA21144012345678"
                     maxLength={17}
-                    required
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.vin}</Form.Control.Feedback>
                   <Form.Text className="text-muted">
                     Уникальный номер кузова — отображается в карточке и админке.
                   </Form.Text>
@@ -610,8 +603,8 @@ const CatalogManage: React.FC = () => {
                 <Form.Group>
                   <Form.Label>Кузов *</Form.Label>
                   <Form.Select
-                    required
                     value={form.bodyType}
+                    isInvalid={!!fieldErrors.bodyType}
                     onChange={(e) => setForm({ ...form, bodyType: e.target.value })}
                   >
                     <option value="">Выберите тип кузова</option>
@@ -621,14 +614,15 @@ const CatalogManage: React.FC = () => {
                       </option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">{fieldErrors.bodyType}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Топливо *</Form.Label>
                   <Form.Select
-                    required
                     value={form.fuelType}
+                    isInvalid={!!fieldErrors.fuelType}
                     onChange={(e) => setForm({ ...form, fuelType: e.target.value })}
                   >
                     <option value="">Выберите топливо</option>
@@ -638,6 +632,7 @@ const CatalogManage: React.FC = () => {
                       </option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">{fieldErrors.fuelType}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
@@ -646,21 +641,20 @@ const CatalogManage: React.FC = () => {
                   <Form.Control
                     type="text"
                     inputMode="decimal"
-                    value={form.engineCapacity ?? ''}
-                    onChange={(e) => {
-                      const n = parsePositiveDecimal(e.target.value);
-                      setForm({ ...form, engineCapacity: n });
-                    }}
+                    isInvalid={!!fieldErrors.engineCapacity}
+                    value={engineCapacityText}
+                    onChange={(e) => setEngineCapacityText(sanitizeDecimalInput(e.target.value))}
                     placeholder="Например, 1.6"
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.engineCapacity}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>КПП *</Form.Label>
                   <Form.Select
-                    required
                     value={form.transmission}
+                    isInvalid={!!fieldErrors.transmission}
                     onChange={(e) => setForm({ ...form, transmission: e.target.value })}
                   >
                     <option value="">Выберите КПП</option>
@@ -670,14 +664,15 @@ const CatalogManage: React.FC = () => {
                       </option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">{fieldErrors.transmission}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Привод *</Form.Label>
                   <Form.Select
-                    required
                     value={form.driveType}
+                    isInvalid={!!fieldErrors.driveType}
                     onChange={(e) => setForm({ ...form, driveType: e.target.value })}
                   >
                     <option value="">Выберите привод</option>
@@ -687,6 +682,7 @@ const CatalogManage: React.FC = () => {
                       </option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">{fieldErrors.driveType}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={4}>
@@ -694,6 +690,7 @@ const CatalogManage: React.FC = () => {
                   <Form.Label>Комплектация</Form.Label>
                   <Form.Control
                     value={form.trim}
+                    maxLength={FIELD_LIMITS.trim}
                     onChange={(e) => setForm({ ...form, trim: e.target.value })}
                   />
                 </Form.Group>
@@ -704,13 +701,15 @@ const CatalogManage: React.FC = () => {
                   <Form.Control
                     type="text"
                     inputMode="numeric"
+                    isInvalid={!!fieldErrors.tradeInDiscount}
                     value={form.tradeInDiscount ?? ''}
                     onChange={(e) => {
-                      const n = parseNonNegativeInt(e.target.value);
-                      setForm({ ...form, tradeInDiscount: n });
+                      const raw = sanitizeDigits(e.target.value, FIELD_LIMITS.discountDigits);
+                      setForm({ ...form, tradeInDiscount: raw ? Number(raw) : null });
                     }}
                     placeholder="0"
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.tradeInDiscount}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={6}>
@@ -719,13 +718,15 @@ const CatalogManage: React.FC = () => {
                   <Form.Control
                     type="text"
                     inputMode="numeric"
+                    isInvalid={!!fieldErrors.creditDiscount}
                     value={form.creditDiscount ?? ''}
                     onChange={(e) => {
-                      const n = parseNonNegativeInt(e.target.value);
-                      setForm({ ...form, creditDiscount: n });
+                      const raw = sanitizeDigits(e.target.value, FIELD_LIMITS.discountDigits);
+                      setForm({ ...form, creditDiscount: raw ? Number(raw) : null });
                     }}
                     placeholder="0"
                   />
+                  <Form.Control.Feedback type="invalid">{fieldErrors.creditDiscount}</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={12}>

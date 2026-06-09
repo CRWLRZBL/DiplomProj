@@ -474,15 +474,16 @@ namespace CourseProjectAPI.Controllers
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(dto.BrandName) || string.IsNullOrWhiteSpace(dto.ModelName))
-                    return BadRequest(new { Error = "Укажите марку и модель." });
+                var validationError = ValidateCatalogListingDto(dto);
+                if (validationError != null)
+                    return BadRequest(new { Error = validationError });
 
                 var created = await _carService.CreateCarListingAsync(dto);
                 return CreatedAtAction(nameof(GetCar), new { id = created.CarId }, created);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Error = ex.Message });
+                return StatusCode(500, new { Error = "Не удалось сохранить карточку. Проверьте данные и попробуйте снова." });
             }
         }
 
@@ -491,15 +492,19 @@ namespace CourseProjectAPI.Controllers
         {
             try
             {
+                var validationError = ValidateCatalogListingDto(dto);
+                if (validationError != null)
+                    return BadRequest(new { Error = validationError });
+
                 var updated = await _carService.UpdateCarListingAsync(id, dto);
                 if (updated == null)
-                    return NotFound();
+                    return NotFound(new { Error = "Автомобиль не найден." });
 
                 return Ok(updated);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Error = ex.Message });
+                return StatusCode(500, new { Error = "Не удалось обновить карточку. Проверьте данные и попробуйте снова." });
             }
         }
 
@@ -568,8 +573,62 @@ namespace CourseProjectAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Error = ex.Message });
+                return StatusCode(500, new { Error = "Не удалось загрузить изображение." });
             }
+        }
+
+        private static string? ValidateCatalogListingDto(SaveCarListingDto dto)
+        {
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(dto.BrandName))
+                errors.Add("Укажите марку.");
+            else if (dto.BrandName.Length > 80)
+                errors.Add("Марка: не более 80 символов.");
+
+            if (string.IsNullOrWhiteSpace(dto.ModelName))
+                errors.Add("Укажите модель.");
+            else if (dto.ModelName.Length > 80)
+                errors.Add("Модель: не более 80 символов.");
+
+            if (string.IsNullOrWhiteSpace(dto.Color))
+                errors.Add("Укажите цвет.");
+            else if (dto.Color.Length > 50)
+                errors.Add("Цвет: не более 50 символов.");
+
+            if (dto.BasePrice < 0 || dto.BasePrice > 999_999_999m)
+                errors.Add("Цена: от 0 до 999 999 999 ₽.");
+
+            if (dto.ModelYear == null || dto.ModelYear < 1980 || dto.ModelYear > DateTime.UtcNow.Year + 1)
+                errors.Add($"Год выпуска: от 1980 до {DateTime.UtcNow.Year + 1}.");
+
+            var vin = dto.Vin?.Trim().ToUpperInvariant() ?? "";
+            if (vin.Length != 17)
+                errors.Add("VIN должен содержать 17 символов.");
+            else if (!System.Text.RegularExpressions.Regex.IsMatch(vin, @"^[A-Z0-9]{17}$"))
+                errors.Add("VIN: только латинские буквы и цифры.");
+
+            if (dto.ListingType == "Used" && (dto.Mileage == null || dto.Mileage < 1 || dto.Mileage > 9_999_999))
+                errors.Add("Пробег: от 1 до 9 999 999 км.");
+
+            if (dto.EngineCapacity is < 0 or > 20m)
+                errors.Add("Объём двигателя: от 0.1 до 20 л.");
+
+            if (string.IsNullOrWhiteSpace(dto.BodyType))
+                errors.Add("Выберите тип кузова.");
+            if (string.IsNullOrWhiteSpace(dto.FuelType))
+                errors.Add("Выберите тип топлива.");
+            if (string.IsNullOrWhiteSpace(dto.Transmission))
+                errors.Add("Выберите коробку передач.");
+            if (string.IsNullOrWhiteSpace(dto.DriveType))
+                errors.Add("Выберите привод.");
+
+            if (dto.TradeInDiscount is < 0 or > 99_999_999m)
+                errors.Add("Скидка трейд-ин: от 0 до 99 999 999 ₽.");
+            if (dto.CreditDiscount is < 0 or > 99_999_999m)
+                errors.Add("Скидка за кредит: от 0 до 99 999 999 ₽.");
+
+            return errors.Count > 0 ? string.Join(" ", errors) : null;
         }
     }
 }

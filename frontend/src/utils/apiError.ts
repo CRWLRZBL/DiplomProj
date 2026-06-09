@@ -27,8 +27,20 @@ export function getApiErrorMessage(e: unknown, fallback: string): string {
     if (Array.isArray(errors) && errors.length > 0) {
       return errors.map(String).join(' ');
     }
+    if (errors && typeof errors === 'object' && !Array.isArray(errors)) {
+      const parts = Object.entries(errors as Record<string, unknown>).flatMap(([key, val]) => {
+        if (Array.isArray(val)) return val.map((m) => `${key}: ${String(m)}`);
+        return [`${key}: ${String(val)}`];
+      });
+      if (parts.length > 0) return parts.join(' ');
+    }
     const cand = o.error ?? o.Error ?? o.message ?? o.Message ?? o.title ?? o.detail;
-    if (typeof cand === 'string' && cand.trim()) return cand;
+    if (typeof cand === 'string' && cand.trim()) {
+      if (/validation errors occurred/i.test(cand)) {
+        return 'Проверьте правильность заполнения полей формы.';
+      }
+      return cand;
+    }
   }
 
   const status = ax.response?.status;
