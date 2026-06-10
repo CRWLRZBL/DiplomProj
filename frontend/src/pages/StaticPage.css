@@ -23,16 +23,19 @@
 }
 
 .static-hero h1,
+.static-hero h2,
 .static-hero .display-6,
 .static-hero p,
 .static-hero nav,
 .static-hero nav a,
 .static-hero nav span {
-  color: #fff !important;
+  color: #ffffff !important;
 }
 
-.static-hero h1,
-.static-hero .display-6 {
+.static-page .static-hero h1,
+.static-page .static-hero h1.display-6,
+.static-page .static-hero .display-6 {
+  color: #ffffff !important;
   font-weight: 800;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);

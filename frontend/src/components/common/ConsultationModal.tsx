@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
+import { getSiteModalManager } from '../../utils/siteModalManager';
 import './ConsultationModal.css';
 
 type Props = {
@@ -61,14 +62,14 @@ const ConsultationModal: React.FC<Props> = ({
     <Modal
       show={show}
       onHide={handleClose}
-      centered
       backdrop={false}
       enforceFocus={false}
       restoreFocus
       scrollable
+      manager={getSiteModalManager()}
       container={typeof document !== 'undefined' ? document.body : undefined}
       className="consultation-modal"
-      dialogClassName="consultation-modal-dialog modal-dialog-centered"
+      dialogClassName="consultation-modal-dialog"
     >
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>

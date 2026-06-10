@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Container, Row, Col, Nav, Badge, Button } from 'react-bootstrap';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Container, Row, Col, Nav, Badge } from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom';
 import CatalogListingCard from '../components/cars/CatalogListingCard';
 import CarFilters from '../components/cars/CarFilters';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -8,11 +8,7 @@ import ErrorAlert from '../components/common/ErrorAlert';
 import EmptyState from '../components/common/EmptyState';
 import { Car } from '../services/models/car';
 import { carService } from '../services/api/carService';
-import { useAuth } from '../context/AuthContext';
-import { USER_ROLES } from '../utils/constants';
-
 const Catalog: React.FC = () => {
-  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get('type') === 'used' ? 'Used' : 'New';
 
@@ -28,8 +24,6 @@ const Catalog: React.FC = () => {
     searchQuery: '',
   });
   const [photoMatchIds, setPhotoMatchIds] = useState<number[] | null>(null);
-
-  const isAdmin = user?.roleName === USER_ROLES.ADMIN;
 
   useEffect(() => {
     loadCars();
@@ -106,13 +100,6 @@ const Catalog: React.FC = () => {
             <h1 className="display-6 fw-bold mb-2">Каталог автомобилей</h1>
             <p className="text-muted mb-0">Мультибрендовый салон «Авторитет» — новые и автомобили с пробегом</p>
           </Col>
-          {isAdmin && (
-            <Col xs="auto">
-              <Button as={Link as any} to="/catalog/manage" className="btn-dealership-dark">
-                Управление каталогом
-              </Button>
-            </Col>
-          )}
         </Row>
 
         <Nav variant="tabs" className="mb-4 catalog-tabs">

@@ -1,0 +1,53 @@
+.catalog-photo-thumb {
+  width: 132px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.catalog-photo-thumb__actions {
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.catalog-photo-thumb__btn {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.4rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  border-radius: 6px;
+}
+
+.catalog-photo-thumb__btn .bi {
+  font-size: 0.72rem;
+  vertical-align: -0.05em;
+}
+
+/* Большая форма каталога: прокрутка только в теле, кнопки всегда видны */
+.catalog-manage-modal__dialog.modal-dialog {
+  max-height: calc(100dvh - 2rem) !important;
+}
+
+.catalog-manage-modal .modal-content {
+  max-height: calc(100dvh - 2rem);
+}
+
+.catalog-manage-modal .modal-content > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.catalog-manage-modal .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.catalog-manage-modal .modal-footer {
+  flex-shrink: 0;
+  border-top: 1px solid #dee2e6;
+  background: #fff;
+}

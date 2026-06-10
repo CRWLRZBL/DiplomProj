@@ -95,14 +95,9 @@ const Header: React.FC = () => {
                     Сообщения
                   </Nav.Link>
                   {isAdmin && (
-                    <>
-                      <Nav.Link as={Link} to="/admin">
-                        Админ-панель
-                      </Nav.Link>
-                      <Nav.Link as={Link} to="/catalog/manage">
-                        Управление каталогом
-                      </Nav.Link>
-                    </>
+                    <Nav.Link as={Link} to="/admin">
+                      Админ-панель
+                    </Nav.Link>
                   )}
                 </>
               ) : (
@@ -170,10 +165,6 @@ const Header: React.FC = () => {
                       <NavDropdown.Item as={Link} to="/admin">
                         <Icon name="admin_panel_settings" className="me-2" style={{ verticalAlign: 'middle' }} />
                         Админ‑панель
-                      </NavDropdown.Item>
-                      <NavDropdown.Item as={Link} to="/catalog/manage">
-                        <Icon name="grid_view" className="me-2" style={{ verticalAlign: 'middle' }} />
-                        Управление каталогом
                       </NavDropdown.Item>
                     </>
                   )}

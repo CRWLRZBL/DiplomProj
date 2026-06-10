@@ -14,6 +14,21 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
+.static-page .static-hero h1,
+.static-page .static-hero h1.display-6,
+.static-page .static-hero h2,
+.static-page .static-hero h3,
+.static-page .static-hero h4,
+.static-page .static-hero h5,
+.static-page .static-hero h6,
+.static-page .static-hero .display-6,
+.static-page .static-hero p,
+.static-page .static-hero nav,
+.static-page .static-hero nav a,
+.static-page .static-hero nav span {
+  color: #ffffff !important;
+}
+
 /* Улучшение контраста для обычного текста */
 p, span, div, li, td, th {
   color: #1a1a1a !important; /* Более темный для лучшего контраста */

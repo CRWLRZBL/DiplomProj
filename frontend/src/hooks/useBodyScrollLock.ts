@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 const OVERLAY_CLASS = 'site-modal-overlay';
 
-/** Блокирует прокрутку и добавляет полноэкранное затемнение (вне transform-контейнеров). */
+/** Блокирует прокрутку и добавляет полноэкранное затемнение. Позицию страницы не сбрасывает. */
 export function useBodyScrollLock(locked: boolean, onOverlayClick?: () => void) {
   const onOverlayClickRef = useRef(onOverlayClick);
   onOverlayClickRef.current = onOverlayClick;
@@ -10,8 +10,14 @@ export function useBodyScrollLock(locked: boolean, onOverlayClick?: () => void) 
   useEffect(() => {
     if (!locked || typeof document === 'undefined') return;
 
-    const scrollY = window.scrollY;
-    const { overflow, position, top, left, right, width } = document.body.style;
+    const html = document.documentElement;
+    const scrollbarWidth = window.innerWidth - html.clientWidth;
+
+    const prev = {
+      htmlOverflow: html.style.overflow,
+      bodyOverflow: document.body.style.overflow,
+      bodyPaddingRight: document.body.style.paddingRight,
+    };
 
     const overlay = document.createElement('div');
     overlay.className = OVERLAY_CLASS;
@@ -20,25 +26,20 @@ export function useBodyScrollLock(locked: boolean, onOverlayClick?: () => void) 
     overlay.addEventListener('click', handleOverlayClick);
     document.body.appendChild(overlay);
 
+    html.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
     document.body.classList.add('site-modal-open');
 
     return () => {
       overlay.removeEventListener('click', handleOverlayClick);
       overlay.remove();
       document.body.classList.remove('site-modal-open');
-      document.body.style.overflow = overflow;
-      document.body.style.position = position;
-      document.body.style.top = top;
-      document.body.style.left = left;
-      document.body.style.right = right;
-      document.body.style.width = width;
-      window.scrollTo(0, scrollY);
+      html.style.overflow = prev.htmlOverflow;
+      document.body.style.overflow = prev.bodyOverflow;
+      document.body.style.paddingRight = prev.bodyPaddingRight;
     };
   // onOverlayClick намеренно не в deps — стабильный overlay без мерцания
   // eslint-disable-next-line react-hooks/exhaustive-deps

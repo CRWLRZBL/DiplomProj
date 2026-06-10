@@ -4,6 +4,7 @@ import { carService } from '../../services/api/carService';
 import { Model } from '../../services/models/car';
 import { CAR_STATUS, CAR_STATUS_LABELS } from '../../utils/constants';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
+import { getSiteModalManager } from '../../utils/siteModalManager';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { validateVin, parseNonNegativeInt } from '../../utils/validation';
 import { DEFAULT_CATALOG_COLORS } from '../../constants/vehicleForm';
@@ -105,12 +106,12 @@ const AddSingleCar: React.FC<Props> = ({ show, onHide, onCreated }) => {
     <Modal
       show={show}
       onHide={handleClose}
-      centered
       scrollable
       backdrop={false}
       enforceFocus={false}
+      manager={getSiteModalManager()}
       className="consultation-modal"
-      dialogClassName="consultation-modal-dialog modal-dialog-centered"
+      dialogClassName="consultation-modal-dialog"
       container={typeof document !== 'undefined' ? document.body : undefined}
     >
       <Modal.Header closeButton>

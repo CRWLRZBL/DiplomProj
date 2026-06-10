@@ -14,6 +14,7 @@ import SalesReportExport from '../components/admin/SalesReportExport';
 import CarImport from '../components/admin/CarImport';
 import AddSingleCar from '../components/admin/AddSingleCar';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { getSiteModalManager } from '../utils/siteModalManager';
 import { getApiErrorMessage } from '../utils/apiError';
 import { validateVin, parseNonNegativeInt } from '../utils/validation';
 import Pagination from '../components/common/Pagination';
@@ -73,7 +74,6 @@ const Admin: React.FC = () => {
   const carItemsPerPage = 10;
 
   useBodyScrollLock(showEditModal);
-
   const isAdmin = user?.roleName === 'Admin';
   const isManager = user?.roleName === 'Manager';
   const isStaff = isAdmin || isManager;
@@ -502,9 +502,9 @@ const Admin: React.FC = () => {
                         <i className="bi bi-graph-up me-2"></i>
                         Отчеты по продажам
                       </Nav.Link>
-                      <Nav.Link as={Link} to="/catalog/manage" className="px-4 py-3">
+                      <Nav.Link as={Link} to="/catalog/manage" className="admin-side-nav__link px-4 py-3">
                         <i className="bi bi-grid me-2"></i>
-                        Каталог (редактирование)
+                        Управление каталогом
                       </Nav.Link>
                     </>
                   )}
@@ -517,58 +517,59 @@ const Admin: React.FC = () => {
             {/* Управление заказами с дашбордом */}
             {activeTab === 'orders' && (
               <>
-                {/* Статистика */}
-                <Card className="shadow-sm border-0 mb-4">
-                  <Card.Header className="bg-light">
-                    <h4 className="mb-0">
-                      <i className="bi bi-speedometer2 me-2"></i>
-                      Общая статистика
-                    </h4>
-                  </Card.Header>
-                  <Card.Body>
-                    <Row>
-                      <Col md={3}>
-                        <Card className="bg-primary text-white text-center">
-                          <Card.Body>
-                            <h3>{pendingOrders.length}</h3>
-                            <p>Новых заказов</p>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                      <Col md={3}>
-                        <Card className="bg-success text-white text-center">
-                          <Card.Body>
-                            <h3>{availableCars.length}</h3>
-                            <p>Автомобилей в наличии</p>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                      <Col md={3}>
-                        <Card className="bg-info text-white text-center">
-                          <Card.Body>
-                            <h3>{orders.length}</h3>
-                            <p>Всего заказов</p>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                      <Col md={3}>
-                        <Card className="bg-warning text-white text-center">
-                          <Card.Body>
-                            <h3>{formatPrice(
-                              orders
-                                .filter(order => {
-                                  const car = cars.find(c => c.carId === order.carId);
-                                  return car?.status === 'Sold' || order.orderStatus === 'Completed';
-                                })
-                                .reduce((sum, order) => sum + order.totalPrice, 0)
-                            )}</h3>
-                            <p>Общая выручка</p>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-                </Card>
+                {isAdmin && (
+                  <Card className="shadow-sm border-0 mb-4">
+                    <Card.Header className="bg-light">
+                      <h4 className="mb-0">
+                        <i className="bi bi-speedometer2 me-2"></i>
+                        Общая статистика
+                      </h4>
+                    </Card.Header>
+                    <Card.Body>
+                      <Row>
+                        <Col md={3}>
+                          <Card className="bg-primary text-white text-center">
+                            <Card.Body>
+                              <h3>{pendingOrders.length}</h3>
+                              <p>Новых заказов</p>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col md={3}>
+                          <Card className="bg-success text-white text-center">
+                            <Card.Body>
+                              <h3>{availableCars.length}</h3>
+                              <p>Автомобилей в наличии</p>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col md={3}>
+                          <Card className="bg-info text-white text-center">
+                            <Card.Body>
+                              <h3>{orders.length}</h3>
+                              <p>Всего заказов</p>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col md={3}>
+                          <Card className="bg-warning text-white text-center">
+                            <Card.Body>
+                              <h3>{formatPrice(
+                                orders
+                                  .filter(order => {
+                                    const car = cars.find(c => c.carId === order.carId);
+                                    return car?.status === 'Sold' || order.orderStatus === 'Completed';
+                                  })
+                                  .reduce((sum, order) => sum + order.totalPrice, 0)
+                              )}</h3>
+                              <p>Общая выручка</p>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+                )}
 
                 <Card className="shadow-sm border-0">
                   <Card.Header className="bg-light">
@@ -957,12 +958,12 @@ const Admin: React.FC = () => {
         <Modal
           show={showEditModal}
           onHide={() => setShowEditModal(false)}
-          centered
           scrollable
           backdrop={false}
           enforceFocus={false}
+          manager={getSiteModalManager()}
           className="consultation-modal"
-          dialogClassName="consultation-modal-dialog modal-dialog-centered"
+          dialogClassName="consultation-modal-dialog"
           container={typeof document !== 'undefined' ? document.body : undefined}
         >
           <Modal.Header closeButton>
@@ -1119,14 +1120,16 @@ const Admin: React.FC = () => {
                           style={{ objectFit: 'cover', display: 'block' }}
                           onError={handleCatalogImageError}
                         />
-                        <div className="p-1 bg-light text-end">
+                        <div className="p-1 bg-light border-top">
                           <Button
                             type="button"
-                            variant="link"
+                            variant="outline-danger"
                             size="sm"
-                            className="p-0 small text-danger"
+                            className="w-100"
+                            style={{ fontSize: '0.68rem', fontWeight: 600, padding: '0.2rem 0.4rem' }}
                             onClick={() => removePhotoAt(idx)}
                           >
+                            <i className="bi bi-trash3 me-1" aria-hidden />
                             Удалить
                           </Button>
                         </div>

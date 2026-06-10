@@ -207,9 +207,6 @@ export const MaintenanceReminders: React.FC = () => {
                   setReminder((p) => ({ ...p, nextServiceDate: e.target.value || undefined }))
                 }
               />
-              <Form.Text className="text-muted">
-                По умолчанию — через 6 месяцев после даты продажи. Нельзя выбрать прошлую дату.
-              </Form.Text>
             </Form.Group>
           </Col>
           <Col md={6}>
@@ -236,7 +233,6 @@ export const MaintenanceReminders: React.FC = () => {
                 }
                 placeholder="15000"
               />
-              <Form.Text className="text-muted">Например, 15000, 30000 и т.д.</Form.Text>
             </Form.Group>
           </Col>
           <Col md={6} className="d-flex align-items-end">

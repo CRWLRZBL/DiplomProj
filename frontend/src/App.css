@@ -1191,9 +1191,14 @@ html, body {
   transition: all 0.3s ease;
 }
 
-.admin-page .nav-pills .nav-link:hover {
+.admin-page .admin-side-nav .nav-link:hover {
   background-color: #f8f9fa;
-  transform: translateX(5px);
+}
+
+.admin-page .admin-side-nav .nav-link.active:hover {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  transform: none;
 }
 
 .admin-page .nav-pills .nav-link {
@@ -1496,14 +1501,14 @@ span, div {
   font-weight: 700 !important;
 }
 
-/* Дополнительная защита — не трогаем баннеры на тёмном фоне */
-*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-1,
-*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-2,
-*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-3,
-*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-4,
-*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-5,
-*:not(.hero-section):not(.static-hero):not(.bg-primary):not(.bg-success):not(.bg-info):not(.bg-warning):not(.bg-danger) .display-6 {
-  color: #212529 !important;
+.static-hero .display-1,
+.static-hero .display-2,
+.static-hero .display-3,
+.static-hero .display-4,
+.static-hero .display-5,
+.static-hero .display-6,
+.static-hero h1 {
+  color: #ffffff !important;
 }
 
 /* Исключения для темных фонов */

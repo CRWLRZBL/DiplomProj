@@ -27,21 +27,32 @@
   background-color: #f8f9fa !important;
 }
 
+.admin-page .admin-side-nav .nav-link.active,
 .admin-page .nav-pills.flex-column .nav-link.active,
 .admin-page .nav-pills .nav-link.active,
 .admin-page a.nav-link.active {
   color: #fff !important;
   background-color: #0d6efd !important;
   text-decoration: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
 }
 
+.admin-page .admin-side-nav .nav-link.active i,
+.admin-page .admin-side-nav .nav-link.active:hover,
+.admin-page .admin-side-nav .nav-link.active:focus,
+.admin-page .admin-side-nav .nav-link.active:focus-visible,
 .admin-page .nav-pills .nav-link.active i,
 .admin-page .nav-pills .nav-link.active:hover,
 .admin-page .nav-pills .nav-link.active:focus,
+.admin-page .nav-pills .nav-link.active:focus-visible,
 .admin-page .admin-side-nav__link.active,
 .admin-page a.admin-side-nav__link.active {
   color: #fff !important;
   text-decoration: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .catalog-detail .catalog-spec-label {
@@ -59,15 +70,22 @@
   color: #fff !important;
 }
 
-/* Баннеры «Контакты», «О компании» */
-.static-hero,
-.static-hero h1,
-.static-hero .display-6,
-.static-hero p,
-.static-hero nav,
-.static-hero nav a,
-.static-hero nav span {
-  color: #fff !important;
+/* Баннеры «Контакты», «О компании» — как белый текст на главной */
+.static-page .static-hero,
+.static-page .static-hero h1,
+.static-page .static-hero h1.display-6,
+.static-page .static-hero .display-6,
+.static-page .static-hero p,
+.static-page .static-hero nav,
+.static-page .static-hero nav a,
+.static-page .static-hero nav span {
+  color: #ffffff !important;
+}
+
+.static-page .static-hero h1,
+.static-page .static-hero h1.display-6,
+.static-page .static-hero .display-6 {
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
 }
 
 .static-hero nav a:hover {

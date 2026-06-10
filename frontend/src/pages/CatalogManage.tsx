@@ -8,11 +8,13 @@ import { Car, SaveCarListing } from '../services/models/car';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Pagination from '../components/common/Pagination';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { getSiteModalManager } from '../utils/siteModalManager';
 import {
   resolvePublicImageUrl,
   resolveCatalogImageSrc,
   handleCatalogImageError,
 } from '../utils/catalogImage';
+import './CatalogManage.css';
 import {
   CAR_CONDITION_OPTIONS,
   DEFAULT_CONDITION_NEW,
@@ -414,12 +416,12 @@ const CatalogManage: React.FC = () => {
         show={showForm}
         onHide={() => setShowForm(false)}
         size="lg"
-        centered
         scrollable
         backdrop={false}
         enforceFocus={false}
-        className="consultation-modal"
-        dialogClassName="consultation-modal-dialog modal-dialog-centered"
+        manager={getSiteModalManager()}
+        className="consultation-modal catalog-manage-modal"
+        dialogClassName="consultation-modal-dialog catalog-manage-modal__dialog"
         container={typeof document !== 'undefined' ? document.body : undefined}
       >
         <Modal.Header closeButton>
@@ -778,8 +780,7 @@ const CatalogManage: React.FC = () => {
                       {photoGallery.map((url, idx) => (
                         <div
                           key={`${url}-${idx}`}
-                          className="position-relative border rounded overflow-hidden"
-                          style={{ width: 120 }}
+                          className="catalog-photo-thumb position-relative border rounded overflow-hidden"
                         >
                           {idx === 0 && (
                             <span
@@ -792,30 +793,32 @@ const CatalogManage: React.FC = () => {
                           <img
                             src={resolvePublicImageUrl(url)}
                             alt=""
-                            width={120}
+                            width={132}
                             height={90}
                             style={{ objectFit: 'contain', display: 'block', background: '#f8f9fa' }}
                             onError={handleCatalogImageError}
                           />
-                          <div className="d-flex gap-1 p-1 bg-light">
+                          <div className="catalog-photo-thumb__actions d-grid gap-1 p-1">
                             {idx > 0 && (
                               <Button
                                 type="button"
-                                variant="link"
+                                variant="outline-primary"
                                 size="sm"
-                                className="p-0 small"
+                                className="catalog-photo-thumb__btn"
                                 onClick={() => setAsMainPhoto(idx)}
                               >
+                                <i className="bi bi-star-fill me-1" aria-hidden />
                                 В главные
                               </Button>
                             )}
                             <Button
                               type="button"
-                              variant="link"
+                              variant="outline-danger"
                               size="sm"
-                              className="p-0 small text-danger ms-auto"
+                              className="catalog-photo-thumb__btn"
                               onClick={() => removePhotoAt(idx)}
                             >
+                              <i className="bi bi-trash3 me-1" aria-hidden />
                               Удалить
                             </Button>
                           </div>

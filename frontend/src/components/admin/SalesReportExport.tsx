@@ -3,6 +3,7 @@ import { Card, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { reportService } from '../../services/api/reportService';
 
 const SalesReportExport: React.FC = () => {
+  const todayIso = new Date().toISOString().split('T')[0];
   const [period, setPeriod] = useState<'month' | 'year' | 'custom'>('month');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -22,8 +23,12 @@ const SalesReportExport: React.FC = () => {
           setError('Укажите начальную и конечную даты');
           return;
         }
-        
-        // Проверяем и исправляем порядок дат, если они в обратном порядке
+
+        if (startDate > todayIso) {
+          setError('Начальная дата не может быть позже текущей');
+          return;
+        }
+
         const startDateObj = new Date(startDate);
         const endDateObj = new Date(endDate);
         
@@ -100,6 +105,7 @@ const SalesReportExport: React.FC = () => {
                   <Form.Control
                     type="date"
                     value={startDate}
+                    max={todayIso}
                     onChange={(e) => setStartDate(e.target.value)}
                   />
                 </Form.Group>
